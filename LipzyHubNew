@@ -5,7 +5,6 @@ local Players = game:GetService("Players")
 local SoundService = game:GetService("SoundService")
 local UserInputService = game:GetService("UserInputService")
 local Lighting = game:GetService("Lighting")
-local MessagingService = game:GetService("MessagingService") -- Tambahan untuk Chat Global
 
 local LocalPlayer = Players.LocalPlayer
 
@@ -36,7 +35,7 @@ local MainCorner = Instance.new("UICorner")
 MainCorner.CornerRadius = UDim.new(0, 10)
 MainCorner.Parent = MainFrame
 
--- Banner Transparan untuk Re-Open (Buka Kembali GUI)
+-- Banner Transparan untuk Re-Open
 local ReopenBanner = Instance.new("ImageButton")
 ReopenBanner.Name = "ReopenBanner"
 ReopenBanner.Size = UDim2.new(0, 120, 0, 50)
@@ -52,7 +51,7 @@ local ReopenCorner = Instance.new("UICorner")
 ReopenCorner.CornerRadius = UDim.new(0, 8)
 ReopenCorner.Parent = ReopenBanner
 
--- Tombol Close (X) -> Menyembunyikan MainFrame & Memunculkan Banner Transparan
+-- Tombol Close (X)
 local CloseBtn = Instance.new("TextButton")
 CloseBtn.Size = UDim2.new(0, 30, 0, 30)
 CloseBtn.Position = UDim2.new(1, -35, 0, 5)
@@ -77,7 +76,7 @@ ReopenBanner.MouseButton1Click:Connect(function()
     ReopenBanner.Visible = false
 end)
 
--- Logo Kiri Atas Banner (Ukuran Mini & Border Rainbow)
+-- Logo Kiri Atas
 local LogoImage = Instance.new("ImageLabel")
 LogoImage.Size = UDim2.new(0, 110, 0, 110)
 LogoImage.Position = UDim2.new(0, 15, 0, 15)
@@ -94,7 +93,7 @@ LogoStroke.Thickness = 3
 LogoStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 LogoStroke.Parent = LogoImage
 
--- Frame Navigasi Kiri (SCRIPT, ADMIN, SOUND, SETTINGS, CHAT)
+-- Frame Navigasi Kiri (SCRIPT, ADMIN, SOUND, SETTINGS)
 local LeftNav = Instance.new("Frame")
 LeftNav.Size = UDim2.new(0, 110, 0, 240)
 LeftNav.Position = UDim2.new(0, 15, 0, 135)
@@ -151,73 +150,8 @@ SettingsFrame.BackgroundTransparency = 1
 SettingsFrame.Visible = false
 SettingsFrame.Parent = MainFrame
 
--- ==========================================
--- FITUR BARU: Frame Konten Chat Global
--- ==========================================
-local ChatFrame = Instance.new("Frame")
-ChatFrame.Name = "ChatFrame"
-ChatFrame.Size = UDim2.new(0, 335, 0, 320)
-ChatFrame.Position = UDim2.new(0, 145, 0, 25)
-ChatFrame.BackgroundTransparency = 1
-ChatFrame.Visible = false
-ChatFrame.Parent = MainFrame
-
-local ChatScrollList = Instance.new("ScrollingFrame")
-ChatScrollList.Name = "ChatScrollList"
-ChatScrollList.Size = UDim2.new(0, 310, 0, 200)
-ChatScrollList.Position = UDim2.new(0, 12, 0, 10)
-ChatScrollList.BackgroundTransparency = 1
-ChatScrollList.BorderSizePixel = 0
-ChatScrollList.ScrollBarThickness = 4
-ChatScrollList.CanvasSize = UDim2.new(0, 0, 0, 0)
-ChatScrollList.AutomaticCanvasSize = Enum.AutomaticSize.Y
-ChatScrollList.Parent = ChatFrame
-
-local ChatLayout = Instance.new("UIListLayout")
-ChatLayout.SortOrder = Enum.SortOrder.LayoutOrder
-ChatLayout.Padding = UDim.new(0, 8)
-ChatLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
-ChatLayout.Parent = ChatScrollList
-
-local ChatInput = Instance.new("TextBox")
-ChatInput.Size = UDim2.new(0, 260, 0, 40)
-ChatInput.Position = UDim2.new(0, 12, 0, 220)
-ChatInput.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
-ChatInput.BackgroundTransparency = 0.2
-ChatInput.PlaceholderText = "Tulis pesan global..."
-ChatInput.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
-ChatInput.Text = ""
-ChatInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-ChatInput.TextSize = 16
-ChatInput.Font = Enum.Font.FredokaOne
-ChatInput.ClearTextOnFocus = false
-ChatInput.Parent = ChatFrame
-
-local ChatInputCorner = Instance.new("UICorner")
-ChatInputCorner.CornerRadius = UDim.new(0, 8)
-ChatInputCorner.Parent = ChatInput
-
-local ChatInputStroke = Instance.new("UIStroke")
-ChatInputStroke.Thickness = 2
-ChatInputStroke.Color = Color3.fromRGB(0, 255, 180)
-ChatInputStroke.Parent = ChatInput
-
-local ChatSendBtn = Instance.new("TextButton")
-ChatSendBtn.Size = UDim2.new(0, 40, 0, 40)
-ChatSendBtn.Position = UDim2.new(0, 280, 0, 220)
-ChatSendBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 120)
-ChatSendBtn.Text = "🚀"
-ChatSendBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-ChatSendBtn.TextSize = 20
-ChatSendBtn.Font = Enum.Font.FredokaOne
-ChatSendBtn.Parent = ChatFrame
-
-local ChatSendBtnCorner = Instance.new("UICorner")
-ChatSendBtnCorner.CornerRadius = UDim.new(0, 8)
-ChatSendBtnCorner.Parent = ChatSendBtn
-
 -- Tombol Navigasi Sistem
-local navButtons = {"SCRIPT", "ADMIN", "SOUND", "SETTINGS", "CHAT"}
+local navButtons = {"SCRIPT", "ADMIN", "SOUND", "SETTINGS"}
 
 for _, name in ipairs(navButtons) do
     local btn = Instance.new("TextButton")
@@ -245,7 +179,6 @@ for _, name in ipairs(navButtons) do
         AdminFrame.Visible = (name == "ADMIN")
         SoundFrame.Visible = (name == "SOUND")
         SettingsFrame.Visible = (name == "SETTINGS")
-        ChatFrame.Visible = (name == "CHAT")
     end)
 end
 
@@ -572,7 +505,7 @@ NpcBtn.MouseButton1Click:Connect(function()
 end)
 
 -- ==========================================
--- KOMPONEN TAB SOUND (FITUR BARU)
+-- KOMPONEN TAB SOUND
 -- ==========================================
 
 local soundEnabled = true
@@ -744,7 +677,7 @@ local SliderCorner = Instance.new("UICorner")
 SliderCorner.CornerRadius = UDim.new(0, 3)
 SliderCorner.Parent = SliderBar
 
--- TextButton transparan sebagai penangkap input slider agar MainFrame Draggable tidak ikut bergerak saat menggeser
+-- TextButton transparan sebagai penangkap input slider
 local SliderTrigger = Instance.new("TextButton")
 SliderTrigger.Size = UDim2.new(1, 0, 1, 14)
 SliderTrigger.Position = UDim2.new(0, 0, 0, -4)
@@ -783,7 +716,7 @@ end
 SliderTrigger.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = true
-        MainFrame.Draggable = false -- Matikan dragging MainFrame sementara
+        MainFrame.Draggable = false
         updateVolume(input)
     end
 end)
@@ -792,7 +725,7 @@ UserInputService.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         if dragging then
             dragging = false
-            MainFrame.Draggable = true -- Kembalikan dragging MainFrame
+            MainFrame.Draggable = true
         end
     end
 end)
@@ -804,7 +737,7 @@ UserInputService.InputChanged:Connect(function(input)
 end)
 
 -- ==========================================
--- KOMPONEN TAB SETTINGS (FITUR BARU TAMBAHAN)
+-- KOMPONEN TAB SETTINGS
 -- ==========================================
 
 -- Overlay Transparansi Latar Belakang MainFrame
@@ -1049,128 +982,10 @@ UserInputService.InputChanged:Connect(function(input)
 end)
 
 -- ==========================================
--- SISTEM CHAT GLOBAL (IN-SCRIPT NETWORK)
+-- ANIMASI & LOOPING
 -- ==========================================
 
-local CHAT_TOPIC = "LipzyHubV5_GlobalChat"
-
-local function addChatMessage(username, userId, message, isLocal)
-    local msgCard = Instance.new("Frame")
-    msgCard.Size = UDim2.new(1, 0, 0, 60)
-    msgCard.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-    msgCard.BackgroundTransparency = 0.2
-    msgCard.Parent = ChatScrollList
-
-    local cardCorner = Instance.new("UICorner")
-    cardCorner.CornerRadius = UDim.new(0, 8)
-    cardCorner.Parent = msgCard
-
-    local cardStroke = Instance.new("UIStroke")
-    cardStroke.Thickness = 1.5
-    cardStroke.Color = isLocal and Color3.fromRGB(0, 255, 180) or Color3.fromRGB(100, 100, 100)
-    cardStroke.Parent = msgCard
-
-    -- Foto Profil Roblox (Bundar)
-    local profileImg = Instance.new("ImageLabel")
-    profileImg.Size = UDim2.new(0, 40, 0, 40)
-    profileImg.Position = UDim2.new(0, 8, 0, 10)
-    profileImg.BackgroundTransparency = 1
-    profileImg.Image = "rbxthumb://type=AvatarHeadShot&id=" .. userId .. "&w=150&h=150"
-    profileImg.Parent = msgCard
-
-    local profileCorner = Instance.new("UICorner")
-    profileCorner.CornerRadius = UDim.new(1, 0) -- Membuat profil benar-benar bundar
-    profileCorner.Parent = profileImg
-
-    -- Username
-    local userLabel = Instance.new("TextLabel")
-    userLabel.Size = UDim2.new(1, -60, 0, 20)
-    userLabel.Position = UDim2.new(0, 55, 0, 8)
-    userLabel.BackgroundTransparency = 1
-    userLabel.Text = username .. (isLocal and " (Kamu)" or "")
-    userLabel.TextColor3 = isLocal and Color3.fromRGB(0, 255, 180) or Color3.fromRGB(255, 255, 255)
-    userLabel.TextSize = 14
-    userLabel.Font = Enum.Font.FredokaOne
-    userLabel.TextXAlignment = Enum.TextXAlignment.Left
-    userLabel.Parent = msgCard
-
-    -- Isi Pesan
-    local msgLabel = Instance.new("TextLabel")
-    msgLabel.Size = UDim2.new(1, -60, 0, 30)
-    msgLabel.Position = UDim2.new(0, 55, 0, 26)
-    msgLabel.BackgroundTransparency = 1
-    msgLabel.Text = message
-    msgLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-    msgLabel.TextSize = 14
-    msgLabel.Font = Enum.Font.FredokaOne
-    msgLabel.TextXAlignment = Enum.TextXAlignment.Left
-    msgLabel.TextWrapped = true
-    msgLabel.Parent = msgCard
-
-    -- Auto scroll ke bawah
-    task.spawn(function()
-        task.wait(0.1)
-        ChatScrollList.CanvasPosition = Vector2.new(0, ChatScrollList.AbsoluteCanvasSize.Y)
-    end)
-
-    -- Batasi jumlah pesan (max 50) untuk mencegah lag
-    local children = ChatScrollList:GetChildren()
-    local frameCount = 0
-    for _, child in ipairs(children) do
-        if child:IsA("Frame") then
-            frameCount += 1
-            if frameCount > 50 then
-                child:Destroy()
-            end
-        end
-    end
-end
-
--- Event saat tombol kirim ditekan
-ChatSendBtn.MouseButton1Click:Connect(function()
-    local msg = ChatInput.Text
-    if msg == "" or msg:match("^%s*$") then return end
-    
-    local payload = {
-        Username = LocalPlayer.Name,
-        UserId = LocalPlayer.UserId,
-        Message = msg
-    }
-    
-    -- Tampilkan di lokal dulu
-    addChatMessage(payload.Username, payload.UserId, payload.Message, true)
-    
-    -- Publish ke MessagingService agar orang lain di server lain / sama bisa lihat
-    pcall(function()
-        MessagingService:PublishAsync(CHAT_TOPIC, payload)
-    end)
-    
-    ChatInput.Text = ""
-end)
-
--- Enter untuk kirim
-ChatInput.FocusLost:Connect(function(enterPressed)
-    if enterPressed then
-        ChatSendBtn.MouseButton1Click:Fire()
-    end
-end)
-
--- Subscribe ke MessagingService (Menerima pesan dari pengguna script lain)
-pcall(function()
-    MessagingService:SubscribeAsync(CHAT_TOPIC, function(data)
-        local payload = data.Data
-        -- Jangan tampilkan pesan sendiri dua kali
-        if payload.UserId ~= LocalPlayer.UserId then
-            addChatMessage(payload.Username, payload.UserId, payload.Message, false)
-        end
-    end)
-end)
-
--- ==========================================
--- ANIMASI & LOOPING LAMA
--- ==========================================
-
--- Label Animasi Mengetik "LIPZY HUB V5" (Diposisikan di area kanan bawah, di bawah ScrollingFrame)
+-- Label Animasi Mengetik "LIPZY HUB V5"
 local TitleAnim = Instance.new("TextLabel")
 TitleAnim.Size = UDim2.new(0, 335, 0, 30)
 TitleAnim.Position = UDim2.new(0, 145, 0, 355)
@@ -1203,7 +1018,7 @@ task.spawn(function()
     end
 end)
 
--- Efek Warna Rainbow pada Border Logo Kiri Atas
+-- Efek Warna Rainbow pada Border Logo
 RunService.RenderStepped:Connect(function()
     local hue = (tick() % 3) / 3
     LogoStroke.Color = Color3.fromHSV(hue, 1, 1)
