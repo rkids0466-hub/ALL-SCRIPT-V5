@@ -1,0 +1,509 @@
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local SoundService = game:GetService("SoundService")
+
+local LocalPlayer = Players.LocalPlayer
+
+-- Hapus GUI lama jika ada
+if CoreGui:FindFirstChild("LipzyHubV5GUI") then
+    CoreGui:FindFirstChild("LipzyHubV5GUI"):Destroy()
+end
+
+-- ScreenGui Principal
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "LipzyHubV5GUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = CoreGui
+
+-- Main Frame (Ukuran 500 x 400)
+local MainFrame = Instance.new("ImageLabel")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 500, 0, 400)
+MainFrame.Position = UDim2.new(0.5, -250, 0.5, -200)
+MainFrame.Image = "rbxassetid://115370825971274"
+MainFrame.ScaleType = Enum.ScaleType.Crop
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.ClipsDescendants = true
+MainFrame.Parent = ScreenGui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 10)
+MainCorner.Parent = MainFrame
+
+-- Tombol Close (X)
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 30, 0, 30)
+CloseBtn.Position = UDim2.new(1, -35, 0, 5)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
+CloseBtn.Text = "X"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.TextSize = 18
+CloseBtn.Font = Enum.Font.FredokaOne
+CloseBtn.Parent = MainFrame
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 6)
+CloseCorner.Parent = CloseBtn
+
+CloseBtn.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+-- Logo Kiri Atas Banner (Ukuran Mini & Border Rainbow)
+local LogoImage = Instance.new("ImageLabel")
+LogoImage.Size = UDim2.new(0, 110, 0, 110)
+LogoImage.Position = UDim2.new(0, 15, 0, 15)
+LogoImage.Image = "rbxassetid://106266705371695"
+LogoImage.BackgroundTransparency = 1
+LogoImage.Parent = MainFrame
+
+local LogoCorner = Instance.new("UICorner")
+LogoCorner.CornerRadius = UDim.new(0, 12)
+LogoCorner.Parent = LogoImage
+
+local LogoStroke = Instance.new("UIStroke")
+LogoStroke.Thickness = 3
+LogoStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+LogoStroke.Parent = LogoImage
+
+-- Frame Navigasi Kiri (SCRIPT, ADMIN, SOUND, SETTINGS)
+local LeftNav = Instance.new("Frame")
+LeftNav.Size = UDim2.new(0, 110, 0, 240)
+LeftNav.Position = UDim2.new(0, 15, 0, 135)
+LeftNav.BackgroundTransparency = 1
+LeftNav.Parent = MainFrame
+
+local NavLayout = Instance.new("UIListLayout")
+NavLayout.SortOrder = Enum.SortOrder.LayoutOrder
+NavLayout.Padding = UDim.new(0, 8)
+NavLayout.Parent = LeftNav
+
+-- Scroll Frame Kanan untuk Daftar Script
+local ScrollList = Instance.new("ScrollingFrame")
+ScrollList.Name = "ScrollList"
+ScrollList.Size = UDim2.new(0, 335, 0, 320)
+ScrollList.Position = UDim2.new(0, 145, 0, 25)
+ScrollList.BackgroundTransparency = 1
+ScrollList.BorderSizePixel = 0
+ScrollList.ScrollBarThickness = 6
+ScrollList.CanvasSize = UDim2.new(0, 0, 0, 0)
+ScrollList.AutomaticCanvasSize = Enum.AutomaticSize.Y
+ScrollList.Parent = MainFrame
+
+local ScrollLayout = Instance.new("UIListLayout")
+ScrollLayout.SortOrder = Enum.SortOrder.LayoutOrder
+ScrollLayout.Padding = UDim.new(0, 7)
+ScrollLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+ScrollLayout.Parent = ScrollList
+
+-- Frame Konten Admin
+local AdminFrame = Instance.new("Frame")
+AdminFrame.Name = "AdminFrame"
+AdminFrame.Size = UDim2.new(0, 335, 0, 320)
+AdminFrame.Position = UDim2.new(0, 145, 0, 25)
+AdminFrame.BackgroundTransparency = 1
+AdminFrame.Visible = false
+AdminFrame.Parent = MainFrame
+
+-- Tombol Navigasi Sistem
+local navButtons = {"SCRIPT", "ADMIN", "SOUND", "SETTINGS"}
+
+for _, name in ipairs(navButtons) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, 0, 0, 42)
+    btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    btn.BackgroundTransparency = 0.15
+    btn.Text = name
+    btn.TextColor3 = Color3.fromRGB(80, 255, 180)
+    btn.TextSize = 18
+    btn.Font = Enum.Font.FredokaOne
+    btn.Parent = LeftNav
+
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 8)
+    btnCorner.Parent = btn
+
+    local textStroke = Instance.new("UIStroke")
+    textStroke.Thickness = 2
+    textStroke.Color = Color3.fromRGB(0, 0, 0)
+    textStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+    textStroke.Parent = btn
+
+    btn.MouseButton1Click:Connect(function()
+        if name == "SCRIPT" then
+            ScrollList.Visible = true
+            AdminFrame.Visible = false
+        elseif name == "ADMIN" then
+            ScrollList.Visible = false
+            AdminFrame.Visible = true
+        end
+    end)
+end
+
+-- Function Tambah Label Kategori
+local function addCategoryLabel(text)
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0.95, 0, 0, 25)
+    label.BackgroundTransparency = 1
+    label.Text = text
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.TextSize = 16
+    label.Font = Enum.Font.FredokaOne
+    label.Parent = ScrollList
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Thickness = 2
+    stroke.Color = Color3.fromRGB(0, 0, 0)
+    stroke.Parent = label
+end
+
+-- Function Tambah Tombol Script
+local function addScriptButton(name, loadstringUrl)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.95, 0, 0, 36)
+    btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    btn.BackgroundTransparency = 0.1
+    btn.Text = name
+    btn.TextColor3 = Color3.fromRGB(0, 230, 180)
+    btn.TextSize = 18
+    btn.Font = Enum.Font.FredokaOne
+    btn.Parent = ScrollList
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 10)
+    corner.Parent = btn
+
+    local textStroke = Instance.new("UIStroke")
+    textStroke.Thickness = 2
+    textStroke.Color = Color3.fromRGB(0, 0, 0)
+    textStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+    textStroke.Parent = btn
+
+    btn.MouseButton1Click:Connect(function()
+        task.spawn(function()
+            loadstring(game:HttpGet(loadstringUrl))()
+        end)
+    end)
+end
+
+-- Data Script NO KEYLESS
+addCategoryLabel("🔐 NO KEYLES")
+
+local noKeylessScripts = {
+    {"SENA V5.2", "https://senahub.xyz/raw/loader"},
+    {"OXIDE HUB", "https://raw.githubusercontent.com/xulfo/Oxide-Loader/main/Main.lua"},
+    {"PULSE HUB", "https://raw.githubusercontent.com/PulseZax/Loader/refs/heads/main/.lua"},
+    {"NEVA HUB", "https://raw.githubusercontent.com/VEZ2/NEVAHUB/main/2"},
+    {"Blyx HUB", "https://flowauth.net/v1/loaders/69d3463240384f3a73fbe32c178093a2.lua"},
+    {"WZEUS HUB", "https://raw.githubusercontent.com/Wzeus-NTH/Wzeusno1/main/Wzeus/nthzz"},
+    {"HOSHI HUB", "https://hoshihub.site/loader.lua"},
+    {"LIMBO HUB", "https://limbohub.my.id/loader.lua"},
+    {"MIRANDA HUB", "https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/mirandaafk.lua"},
+    {"NIGHT HUB", "https://raw.githubusercontent.com/WhiteX1208/Scripts/refs/heads/main/StealEggOnly.luau"},
+    {"BK's HUB", "https://api.luarmor.net/files/v4/loaders/9ee4edde227ac85f50872bf9e4226508.lua"},
+    {"LKZ", "https://raw.githubusercontent.com/LucasggkX/LKZ-Hub/refs/heads/main/Loader.lua"},
+    {"CHILI HUB", "https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua"}
+}
+
+for _, scriptData in ipairs(noKeylessScripts) do
+    addScriptButton(scriptData[1], scriptData[2])
+end
+
+-- Data Script KEYLESS
+addCategoryLabel("🔐 KEYLESS")
+
+local keylessScripts = {
+    {"Sys Hub", "https://syshub.fun/free"},
+    {"FYY COMMUNITY", "https://FyyCommunity.my.id"},
+    {"UNKNOWN HUB", "https://unknownhub.win/api/projects/54474b4c5d5a4f459909c4cb70e7b4f3/loader"},
+    {"YANTO HUB", "https://raw.githubusercontent.com/YantoRoblox/Script-Free-YantoHUB/refs/heads/main/YantoHUB"},
+    {"ZERION HUB", "https://zeroinhub.com/api/script"}
+}
+
+for _, scriptData in ipairs(keylessScripts) do
+    addScriptButton(scriptData[1], scriptData[2])
+end
+
+-- ==========================================
+-- KOMPONEN TAB ADMIN & SISTEM PESAN / NPC
+-- ==========================================
+
+-- Container Pesan Layar Utama
+local BroadcastContainer = Instance.new("Frame")
+BroadcastContainer.Name = "BroadcastContainer"
+BroadcastContainer.Size = UDim2.new(0, 600, 1, 0)
+BroadcastContainer.Position = UDim2.new(0.5, -300, 0, 20)
+BroadcastContainer.BackgroundTransparency = 1
+BroadcastContainer.Parent = ScreenGui
+
+local BroadcastLayout = Instance.new("UIListLayout")
+BroadcastLayout.SortOrder = Enum.SortOrder.LayoutOrder
+BroadcastLayout.Padding = UDim.new(0, 10)
+BroadcastLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+BroadcastLayout.VerticalAlignment = Enum.VerticalAlignment.Top
+BroadcastLayout.Parent = BroadcastContainer
+
+-- TextBox Input Message
+local MsgInput = Instance.new("TextBox")
+MsgInput.Size = UDim2.new(0, 310, 0, 45)
+MsgInput.Position = UDim2.new(0, 12, 0, 15)
+MsgInput.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+MsgInput.BackgroundTransparency = 0.2
+MsgInput.PlaceholderText = "MESSAGE..."
+MsgInput.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+MsgInput.Text = ""
+MsgInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+MsgInput.TextSize = 16
+MsgInput.Font = Enum.Font.FredokaOne
+MsgInput.ClearTextOnFocus = false
+MsgInput.Parent = AdminFrame
+
+local MsgInputCorner = Instance.new("UICorner")
+MsgInputCorner.CornerRadius = UDim.new(0, 8)
+MsgInputCorner.Parent = MsgInput
+
+local MsgInputStroke = Instance.new("UIStroke")
+MsgInputStroke.Thickness = 2
+MsgInputStroke.Color = Color3.fromRGB(0, 255, 180)
+MsgInputStroke.Parent = MsgInput
+
+-- Tombol SEND
+local SendBtn = Instance.new("TextButton")
+SendBtn.Size = UDim2.new(0, 310, 0, 42)
+SendBtn.Position = UDim2.new(0, 12, 0, 70)
+SendBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 120)
+SendBtn.Text = "SEND"
+SendBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SendBtn.TextSize = 18
+SendBtn.Font = Enum.Font.FredokaOne
+SendBtn.Parent = AdminFrame
+
+local SendBtnCorner = Instance.new("UICorner")
+SendBtnCorner.CornerRadius = UDim.new(0, 8)
+SendBtnCorner.Parent = SendBtn
+
+local SendBtnStroke = Instance.new("UIStroke")
+SendBtnStroke.Thickness = 2
+SendBtnStroke.Color = Color3.fromRGB(0, 0, 0)
+SendBtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+SendBtnStroke.Parent = SendBtn
+
+-- Label Warning / Status Admin
+local AdminWarning = Instance.new("TextLabel")
+AdminWarning.Size = UDim2.new(0, 310, 0, 25)
+AdminWarning.Position = UDim2.new(0, 12, 0, 120)
+AdminWarning.BackgroundTransparency = 1
+AdminWarning.Text = ""
+AdminWarning.TextColor3 = Color3.fromRGB(255, 80, 80)
+AdminWarning.TextSize = 15
+AdminWarning.Font = Enum.Font.FredokaOne
+AdminWarning.Parent = AdminFrame
+
+-- Tombol NPC (LIPZY HUB)
+local NpcBtn = Instance.new("TextButton")
+NpcBtn.Size = UDim2.new(0, 310, 0, 42)
+NpcBtn.Position = UDim2.new(0, 12, 0, 155)
+NpcBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+NpcBtn.BackgroundTransparency = 0.15
+NpcBtn.Text = "NPC (LIPZY HUB)"
+NpcBtn.TextColor3 = Color3.fromRGB(80, 255, 180)
+NpcBtn.TextSize = 18
+NpcBtn.Font = Enum.Font.FredokaOne
+NpcBtn.Parent = AdminFrame
+
+local NpcBtnCorner = Instance.new("UICorner")
+NpcBtnCorner.CornerRadius = UDim.new(0, 8)
+NpcBtnCorner.Parent = NpcBtn
+
+local NpcBtnStroke = Instance.new("UIStroke")
+NpcBtnStroke.Thickness = 2
+NpcBtnStroke.Color = Color3.fromRGB(0, 0, 0)
+NpcBtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+NpcBtnStroke.Parent = NpcBtn
+
+-- Fungsi Broadcast Pesan Admin
+local function sendAdminMessage(msgText)
+    if msgText == "" then return end
+
+    -- Frame Pesan (Ukuran Lebar 600)
+    local MsgCard = Instance.new("Frame")
+    MsgCard.Size = UDim2.new(0, 600, 0, 90)
+    MsgCard.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+    MsgCard.BackgroundTransparency = 0.15
+    MsgCard.Parent = BroadcastContainer
+
+    local CardCorner = Instance.new("UICorner")
+    CardCorner.CornerRadius = UDim.new(0, 12)
+    CardCorner.Parent = MsgCard
+
+    local CardStroke = Instance.new("UIStroke")
+    CardStroke.Thickness = 2
+    CardStroke.Color = Color3.fromRGB(0, 255, 180)
+    CardStroke.Parent = MsgCard
+
+    -- Foto Profil Roblox (LifzxAfter2)
+    local ProfileImg = Instance.new("ImageLabel")
+    ProfileImg.Size = UDim2.new(0, 70, 0, 70)
+    ProfileImg.Position = UDim2.new(0, 10, 0, 10)
+    ProfileImg.BackgroundTransparency = 1
+    
+    local success, userId = pcall(function()
+        return Players:GetUserIdFromNameAsync("LifzxAfter2")
+    end)
+    if success and userId then
+        ProfileImg.Image = "rbxthumb://type=AvatarHeadShot&id=" .. userId .. "&w=150&h=150"
+    else
+        ProfileImg.Image = "rbxassetid://106266705371695"
+    end
+    ProfileImg.Parent = MsgCard
+
+    local ProfileCorner = Instance.new("UICorner")
+    ProfileCorner.CornerRadius = UDim.new(0, 10)
+    ProfileCorner.Parent = ProfileImg
+
+    -- Header Title (👑LIPZY HUB👑)
+    local HeaderLabel = Instance.new("TextLabel")
+    HeaderLabel.Size = UDim2.new(0, 500, 0, 25)
+    HeaderLabel.Position = UDim2.new(0, 90, 0, 10)
+    HeaderLabel.BackgroundTransparency = 1
+    HeaderLabel.Text = "👑LIPZY HUB👑"
+    HeaderLabel.TextColor3 = Color3.fromRGB(255, 215, 0)
+    HeaderLabel.TextSize = 18
+    HeaderLabel.Font = Enum.Font.FredokaOne
+    HeaderLabel.TextXAlignment = Enum.TextXAlignment.Left
+    HeaderLabel.Parent = MsgCard
+
+    -- Isi Pesan
+    local ContentLabel = Instance.new("TextLabel")
+    ContentLabel.Size = UDim2.new(0, 500, 0, 45)
+    ContentLabel.Position = UDim2.new(0, 90, 0, 35)
+    ContentLabel.BackgroundTransparency = 1
+    ContentLabel.Text = msgText
+    ContentLabel.TextColor3 = Color3.fromRGB(80, 255, 180)
+    ContentLabel.TextSize = 16
+    ContentLabel.Font = Enum.Font.FredokaOne
+    ContentLabel.TextXAlignment = Enum.TextXAlignment.Left
+    ContentLabel.TextWrapped = true
+    ContentLabel.Parent = MsgCard
+
+    -- Suara Admin Abuse
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://9114223280"
+    sound.Volume = 1
+    sound.Parent = SoundService
+    sound:Play()
+    sound.Ended:Connect(function()
+        sound:Destroy()
+    end)
+
+    -- Auto Hilang setelah 6 detik
+    task.delay(6, function()
+        if MsgCard and MsgCard.Parent then
+            MsgCard:Destroy()
+        end
+    end)
+end
+
+-- Event Klik Send Message
+SendBtn.MouseButton1Click:Connect(function()
+    if LocalPlayer.Name == "LifzxAfter2" then
+        AdminWarning.Text = ""
+        sendAdminMessage(MsgInput.Text)
+        MsgInput.Text = ""
+    else
+        AdminWarning.Text = "You are not an admin🙏🏻"
+    end
+end)
+
+-- Event Klik Spawn NPC
+NpcBtn.MouseButton1Click:Connect(function()
+    task.spawn(function()
+        local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+        local rootPart = character:FindFirstChild("HumanoidRootPart")
+        if not rootPart then return end
+
+        local targetUserId = 7860161471
+        pcall(function()
+            targetUserId = Players:GetUserIdFromNameAsync("LifzxAfter2")
+        end)
+
+        local npcModel
+        local successModel, model = pcall(function()
+            return Players:CreateHumanoidModelFromUserId(targetUserId)
+        end)
+
+        if successModel and model then
+            npcModel = model
+        else
+            npcModel = Instance.new("Model")
+            npcModel.Name = "LifzxAfter2"
+            local hum = Instance.new("Humanoid")
+            hum.Parent = npcModel
+        end
+
+        npcModel.Name = "LifzxAfter2"
+        npcModel:SetPrimaryPartCFrame(rootPart.CFrame * CFrame.new(0, 0, -5) * CFrame.Angles(0, math.rad(180), 0))
+        npcModel.Parent = workspace
+
+        -- Chat Bubble NPC
+        local head = npcModel:FindFirstChild("Head")
+        if head then
+            game:GetService("Chat"):Chat(head, "HELOW " .. LocalPlayer.Name, Enum.ChatColor.Green)
+        end
+
+        -- Animation Emote Hai (Wave)
+        local humanoid = npcModel:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            local anim = Instance.new("Animation")
+            anim.AnimationId = "rbxassetid://507770239"
+            local track = humanoid:LoadAnimation(anim)
+            track:Play()
+        end
+    end)
+end)
+
+-- ==========================================
+-- ANIMASI & LOOPING LAMA
+-- ==========================================
+
+-- Label Animasi Mengetik "LIPZY HUB V5" (Diposisikan di area kanan bawah, di bawah ScrollingFrame)
+local TitleAnim = Instance.new("TextLabel")
+TitleAnim.Size = UDim2.new(0, 335, 0, 30)
+TitleAnim.Position = UDim2.new(0, 145, 0, 355)
+TitleAnim.BackgroundTransparency = 1
+TitleAnim.Text = ""
+TitleAnim.TextColor3 = Color3.fromRGB(0, 255, 120)
+TitleAnim.TextSize = 20
+TitleAnim.Font = Enum.Font.FredokaOne
+TitleAnim.TextXAlignment = Enum.TextXAlignment.Center
+TitleAnim.Parent = MainFrame
+
+local TitleStroke = Instance.new("UIStroke")
+TitleStroke.Thickness = 2
+TitleStroke.Color = Color3.fromRGB(0, 0, 0)
+TitleStroke.Parent = TitleAnim
+
+-- Efek Typing Animation Loop
+task.spawn(function()
+    local fullText = "LIPZY HUB V5"
+    while task.wait(1) do
+        for i = 1, #fullText do
+            TitleAnim.Text = string.sub(fullText, 1, i)
+            task.wait(0.12)
+        end
+        task.wait(1.5)
+        for i = #fullText, 0, -1 do
+            TitleAnim.Text = string.sub(fullText, 1, i)
+            task.wait(0.06)
+        end
+    end
+end)
+
+-- Efek Warna Rainbow pada Border Logo Kiri Atas
+RunService.RenderStepped:Connect(function()
+    local hue = (tick() % 3) / 3
+    LogoStroke.Color = Color3.fromHSV(hue, 1, 1)
+end)
