@@ -1,8 +1,10 @@
+-- // Lipzy Hub V5 GUI Script
 local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local SoundService = game:GetService("SoundService")
+local UserInputService = game:GetService("UserInputService")
 
 local LocalPlayer = Players.LocalPlayer
 
@@ -33,7 +35,23 @@ local MainCorner = Instance.new("UICorner")
 MainCorner.CornerRadius = UDim.new(0, 10)
 MainCorner.Parent = MainFrame
 
--- Tombol Close (X)
+-- Banner Transparan untuk Re-Open (Buka Kembali GUI)
+local ReopenBanner = Instance.new("ImageButton")
+ReopenBanner.Name = "ReopenBanner"
+ReopenBanner.Size = UDim2.new(0, 120, 0, 50)
+ReopenBanner.Position = UDim2.new(0, 10, 0.5, -25)
+ReopenBanner.Image = "rbxassetid://74839631873387"
+ReopenBanner.BackgroundTransparency = 1
+ReopenBanner.Active = true
+ReopenBanner.Draggable = true
+ReopenBanner.Visible = false
+ReopenBanner.Parent = ScreenGui
+
+local ReopenCorner = Instance.new("UICorner")
+ReopenCorner.CornerRadius = UDim.new(0, 8)
+ReopenCorner.Parent = ReopenBanner
+
+-- Tombol Close (X) -> Menyembunyikan MainFrame & Memunculkan Banner Transparan
 local CloseBtn = Instance.new("TextButton")
 CloseBtn.Size = UDim2.new(0, 30, 0, 30)
 CloseBtn.Position = UDim2.new(1, -35, 0, 5)
@@ -49,7 +67,13 @@ CloseCorner.CornerRadius = UDim.new(0, 6)
 CloseCorner.Parent = CloseBtn
 
 CloseBtn.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
+    MainFrame.Visible = false
+    ReopenBanner.Visible = true
+end)
+
+ReopenBanner.MouseButton1Click:Connect(function()
+    MainFrame.Visible = true
+    ReopenBanner.Visible = false
 end)
 
 -- Logo Kiri Atas Banner (Ukuran Mini & Border Rainbow)
@@ -108,6 +132,15 @@ AdminFrame.BackgroundTransparency = 1
 AdminFrame.Visible = false
 AdminFrame.Parent = MainFrame
 
+-- Frame Konten Sound
+local SoundFrame = Instance.new("Frame")
+SoundFrame.Name = "SoundFrame"
+SoundFrame.Size = UDim2.new(0, 335, 0, 320)
+SoundFrame.Position = UDim2.new(0, 145, 0, 25)
+SoundFrame.BackgroundTransparency = 1
+SoundFrame.Visible = false
+SoundFrame.Parent = MainFrame
+
 -- Tombol Navigasi Sistem
 local navButtons = {"SCRIPT", "ADMIN", "SOUND", "SETTINGS"}
 
@@ -133,13 +166,9 @@ for _, name in ipairs(navButtons) do
     textStroke.Parent = btn
 
     btn.MouseButton1Click:Connect(function()
-        if name == "SCRIPT" then
-            ScrollList.Visible = true
-            AdminFrame.Visible = false
-        elseif name == "ADMIN" then
-            ScrollList.Visible = false
-            AdminFrame.Visible = true
-        end
+        ScrollList.Visible = (name == "SCRIPT")
+        AdminFrame.Visible = (name == "ADMIN")
+        SoundFrame.Visible = (name == "SOUND")
     end)
 end
 
@@ -297,17 +326,10 @@ AdminWarning.Size = UDim2.new(0, 310, 0, 25)
 AdminWarning.Position = UDim2.new(0, 12, 0, 120)
 AdminWarning.BackgroundTransparency = 1
 AdminWarning.Text = ""
-AdminWarning.TextColor3 = Color3.fromRGB(255, 50, 50) -- Merah Terang
+AdminWarning.TextColor3 = Color3.fromRGB(255, 80, 80)
 AdminWarning.TextSize = 15
 AdminWarning.Font = Enum.Font.FredokaOne
 AdminWarning.Parent = AdminFrame
-
--- UIStroke untuk pinggiran warna hitam pada teks peringatan admin
-local AdminWarningStroke = Instance.new("UIStroke")
-AdminWarningStroke.Thickness = 2
-AdminWarningStroke.Color = Color3.fromRGB(0, 0, 0) -- Warna Hitam
-AdminWarningStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-AdminWarningStroke.Parent = AdminWarning
 
 -- Tombol NPC (LIPZY HUB)
 local NpcBtn = Instance.new("TextButton")
@@ -470,6 +492,238 @@ NpcBtn.MouseButton1Click:Connect(function()
             track:Play()
         end
     end)
+end)
+
+-- ==========================================
+-- KOMPONEN TAB SOUND (FITUR BARU)
+-- ==========================================
+
+local soundEnabled = true
+local currentVolume = 0.5
+local activeSound = nil
+
+local function playCustomSound(id, isLooped)
+    if activeSound then
+        activeSound:Stop()
+        activeSound:Destroy()
+        activeSound = nil
+    end
+
+    if not soundEnabled then return end
+
+    local cleanId = tostring(id):gsub("%D", "")
+    if cleanId == "" then return end
+
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://" .. cleanId
+    sound.Volume = currentVolume
+    sound.Looped = isLooped or false
+    sound.Parent = SoundService
+    sound:Play()
+
+    activeSound = sound
+
+    sound.Ended:Connect(function()
+        if activeSound == sound then
+            activeSound:Destroy()
+            activeSound = nil
+        end
+    end)
+end
+
+-- 1. Input ID Sound
+local SoundIdInput = Instance.new("TextBox")
+SoundIdInput.Size = UDim2.new(0, 310, 0, 40)
+SoundIdInput.Position = UDim2.new(0, 12, 0, 10)
+SoundIdInput.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+SoundIdInput.BackgroundTransparency = 0.1
+SoundIdInput.PlaceholderText = "ID SOUND.."
+SoundIdInput.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+SoundIdInput.Text = ""
+SoundIdInput.TextColor3 = Color3.fromRGB(0, 0, 0)
+SoundIdInput.TextSize = 16
+SoundIdInput.Font = Enum.Font.FredokaOne
+SoundIdInput.ClearTextOnFocus = false
+SoundIdInput.Parent = SoundFrame
+
+local SoundIdCorner = Instance.new("UICorner")
+SoundIdCorner.CornerRadius = UDim.new(0, 8)
+SoundIdCorner.Parent = SoundIdInput
+
+-- 2. Tombol SEND Sound ID
+local SoundSendBtn = Instance.new("TextButton")
+SoundSendBtn.Size = UDim2.new(0, 160, 0, 40)
+SoundSendBtn.Position = UDim2.new(0, 87, 0, 58)
+SoundSendBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+SoundSendBtn.BackgroundTransparency = 0.1
+SoundSendBtn.Text = "SEND"
+SoundSendBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+SoundSendBtn.TextSize = 22
+SoundSendBtn.Font = Enum.Font.FredokaOne
+SoundSendBtn.Parent = SoundFrame
+
+local SoundSendCorner = Instance.new("UICorner")
+SoundSendCorner.CornerRadius = UDim.new(0, 8)
+SoundSendCorner.Parent = SoundSendBtn
+
+SoundSendBtn.MouseButton1Click:Connect(function()
+    playCustomSound(SoundIdInput.Text, false)
+end)
+
+-- 3. Tombol CIKADAP (1x Play)
+local CikadapBtn = Instance.new("TextButton")
+CikadapBtn.Size = UDim2.new(0, 190, 0, 42)
+CikadapBtn.Position = UDim2.new(0, 12, 0, 110)
+CikadapBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CikadapBtn.BackgroundTransparency = 0.1
+CikadapBtn.Text = "CIKADAP"
+CikadapBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+CikadapBtn.TextSize = 20
+CikadapBtn.Font = Enum.Font.FredokaOne
+CikadapBtn.Parent = SoundFrame
+
+local CikadapCorner = Instance.new("UICorner")
+CikadapCorner.CornerRadius = UDim.new(0, 8)
+CikadapCorner.Parent = CikadapBtn
+
+CikadapBtn.MouseButton1Click:Connect(function()
+    playCustomSound("4004629054", false)
+end)
+
+-- 4. Tombol BRAZIL (Loop Play)
+local BrazilBtn = Instance.new("TextButton")
+BrazilBtn.Size = UDim2.new(0, 190, 0, 42)
+BrazilBtn.Position = UDim2.new(0, 12, 0, 162)
+BrazilBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+BrazilBtn.BackgroundTransparency = 0.1
+BrazilBtn.Text = "BRAZIL"
+BrazilBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+BrazilBtn.TextSize = 20
+BrazilBtn.Font = Enum.Font.FredokaOne
+BrazilBtn.Parent = SoundFrame
+
+local BrazilCorner = Instance.new("UICorner")
+BrazilCorner.CornerRadius = UDim.new(0, 8)
+BrazilCorner.Parent = BrazilBtn
+
+BrazilBtn.MouseButton1Click:Connect(function()
+    playCustomSound("84093014695702", true)
+end)
+
+-- 5. Toggle ON / OFF Button
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Size = UDim2.new(0, 100, 0, 42)
+ToggleBtn.Position = UDim2.new(0, 215, 0, 110)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ToggleBtn.BackgroundTransparency = 0.1
+ToggleBtn.Text = "ON"
+ToggleBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+ToggleBtn.TextSize = 20
+ToggleBtn.Font = Enum.Font.FredokaOne
+ToggleBtn.Parent = SoundFrame
+
+local ToggleCorner = Instance.new("UICorner")
+ToggleCorner.CornerRadius = UDim.new(0, 8)
+ToggleCorner.Parent = ToggleBtn
+
+ToggleBtn.MouseButton1Click:Connect(function()
+    soundEnabled = not soundEnabled
+    if soundEnabled then
+        ToggleBtn.Text = "ON"
+    else
+        ToggleBtn.Text = "OFF"
+        if activeSound then
+            activeSound:Stop()
+            activeSound:Destroy()
+            activeSound = nil
+        end
+    end
+end)
+
+-- 6. VOLUME Label & Slider
+local VolumeLabel = Instance.new("TextLabel")
+VolumeLabel.Size = UDim2.new(0, 100, 0, 20)
+VolumeLabel.Position = UDim2.new(0, 215, 0, 162)
+VolumeLabel.BackgroundTransparency = 1
+VolumeLabel.Text = "VOLUME"
+VolumeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+VolumeLabel.TextSize = 14
+VolumeLabel.Font = Enum.Font.FredokaOne
+VolumeLabel.Parent = SoundFrame
+
+local VolStroke = Instance.new("UIStroke")
+VolStroke.Thickness = 1.5
+VolStroke.Color = Color3.fromRGB(0, 0, 0)
+VolStroke.Parent = VolumeLabel
+
+local SliderBar = Instance.new("Frame")
+SliderBar.Size = UDim2.new(0, 100, 0, 6)
+SliderBar.Position = UDim2.new(0, 215, 0, 188)
+SliderBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+SliderBar.BorderSizePixel = 0
+SliderBar.Parent = SoundFrame
+
+local SliderCorner = Instance.new("UICorner")
+SliderCorner.CornerRadius = UDim.new(0, 3)
+SliderCorner.Parent = SliderBar
+
+-- TextButton transparan sebagai penangkap input slider agar MainFrame Draggable tidak ikut bergerak saat menggeser
+local SliderTrigger = Instance.new("TextButton")
+SliderTrigger.Size = UDim2.new(1, 0, 1, 14)
+SliderTrigger.Position = UDim2.new(0, 0, 0, -4)
+SliderTrigger.BackgroundTransparency = 1
+SliderTrigger.Text = ""
+SliderTrigger.Parent = SliderBar
+
+local SliderKnob = Instance.new("Frame")
+SliderKnob.Size = UDim2.new(0, 14, 0, 14)
+SliderKnob.Position = UDim2.new(0.5, -7, 0.5, -7)
+SliderKnob.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+SliderKnob.BorderSizePixel = 0
+SliderKnob.Active = false
+SliderKnob.Parent = SliderBar
+
+local KnobCorner = Instance.new("UICorner")
+KnobCorner.CornerRadius = UDim.new(1, 0)
+KnobCorner.Parent = SliderKnob
+
+-- Slider Logic
+local dragging = false
+
+local function updateVolume(input)
+    local barPos = SliderBar.AbsolutePosition.X
+    local barSize = SliderBar.AbsoluteSize.X
+    local mousePos = input.Position.X
+    local percent = math.clamp((mousePos - barPos) / barSize, 0, 1)
+    
+    SliderKnob.Position = UDim2.new(percent, -7, 0.5, -7)
+    currentVolume = percent
+    if activeSound then
+        activeSound.Volume = currentVolume
+    end
+end
+
+SliderTrigger.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        MainFrame.Draggable = false -- Matikan dragging MainFrame sementara
+        updateVolume(input)
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if dragging then
+            dragging = false
+            MainFrame.Draggable = true -- Kembalikan dragging MainFrame
+        end
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        updateVolume(input)
+    end
 end)
 
 -- ==========================================
