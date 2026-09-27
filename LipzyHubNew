@@ -1,10 +1,11 @@
--- // Lipzy Hub V5 GUI Script
 local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local SoundService = game:GetService("SoundService")
 local UserInputService = game:GetService("UserInputService")
+local Lighting = game:GetService("Lighting")
+local MessagingService = game:GetService("MessagingService") -- Tambahan untuk Chat Global
 
 local LocalPlayer = Players.LocalPlayer
 
@@ -93,7 +94,7 @@ LogoStroke.Thickness = 3
 LogoStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 LogoStroke.Parent = LogoImage
 
--- Frame Navigasi Kiri (SCRIPT, ADMIN, SOUND, SETTINGS)
+-- Frame Navigasi Kiri (SCRIPT, ADMIN, SOUND, SETTINGS, CHAT)
 local LeftNav = Instance.new("Frame")
 LeftNav.Size = UDim2.new(0, 110, 0, 240)
 LeftNav.Position = UDim2.new(0, 15, 0, 135)
@@ -141,8 +142,82 @@ SoundFrame.BackgroundTransparency = 1
 SoundFrame.Visible = false
 SoundFrame.Parent = MainFrame
 
+-- Frame Konten Settings
+local SettingsFrame = Instance.new("Frame")
+SettingsFrame.Name = "SettingsFrame"
+SettingsFrame.Size = UDim2.new(0, 335, 0, 320)
+SettingsFrame.Position = UDim2.new(0, 145, 0, 25)
+SettingsFrame.BackgroundTransparency = 1
+SettingsFrame.Visible = false
+SettingsFrame.Parent = MainFrame
+
+-- ==========================================
+-- FITUR BARU: Frame Konten Chat Global
+-- ==========================================
+local ChatFrame = Instance.new("Frame")
+ChatFrame.Name = "ChatFrame"
+ChatFrame.Size = UDim2.new(0, 335, 0, 320)
+ChatFrame.Position = UDim2.new(0, 145, 0, 25)
+ChatFrame.BackgroundTransparency = 1
+ChatFrame.Visible = false
+ChatFrame.Parent = MainFrame
+
+local ChatScrollList = Instance.new("ScrollingFrame")
+ChatScrollList.Name = "ChatScrollList"
+ChatScrollList.Size = UDim2.new(0, 310, 0, 200)
+ChatScrollList.Position = UDim2.new(0, 12, 0, 10)
+ChatScrollList.BackgroundTransparency = 1
+ChatScrollList.BorderSizePixel = 0
+ChatScrollList.ScrollBarThickness = 4
+ChatScrollList.CanvasSize = UDim2.new(0, 0, 0, 0)
+ChatScrollList.AutomaticCanvasSize = Enum.AutomaticSize.Y
+ChatScrollList.Parent = ChatFrame
+
+local ChatLayout = Instance.new("UIListLayout")
+ChatLayout.SortOrder = Enum.SortOrder.LayoutOrder
+ChatLayout.Padding = UDim.new(0, 8)
+ChatLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+ChatLayout.Parent = ChatScrollList
+
+local ChatInput = Instance.new("TextBox")
+ChatInput.Size = UDim2.new(0, 260, 0, 40)
+ChatInput.Position = UDim2.new(0, 12, 0, 220)
+ChatInput.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+ChatInput.BackgroundTransparency = 0.2
+ChatInput.PlaceholderText = "Tulis pesan global..."
+ChatInput.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+ChatInput.Text = ""
+ChatInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+ChatInput.TextSize = 16
+ChatInput.Font = Enum.Font.FredokaOne
+ChatInput.ClearTextOnFocus = false
+ChatInput.Parent = ChatFrame
+
+local ChatInputCorner = Instance.new("UICorner")
+ChatInputCorner.CornerRadius = UDim.new(0, 8)
+ChatInputCorner.Parent = ChatInput
+
+local ChatInputStroke = Instance.new("UIStroke")
+ChatInputStroke.Thickness = 2
+ChatInputStroke.Color = Color3.fromRGB(0, 255, 180)
+ChatInputStroke.Parent = ChatInput
+
+local ChatSendBtn = Instance.new("TextButton")
+ChatSendBtn.Size = UDim2.new(0, 40, 0, 40)
+ChatSendBtn.Position = UDim2.new(0, 280, 0, 220)
+ChatSendBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 120)
+ChatSendBtn.Text = "🚀"
+ChatSendBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ChatSendBtn.TextSize = 20
+ChatSendBtn.Font = Enum.Font.FredokaOne
+ChatSendBtn.Parent = ChatFrame
+
+local ChatSendBtnCorner = Instance.new("UICorner")
+ChatSendBtnCorner.CornerRadius = UDim.new(0, 8)
+ChatSendBtnCorner.Parent = ChatSendBtn
+
 -- Tombol Navigasi Sistem
-local navButtons = {"SCRIPT", "ADMIN", "SOUND", "SETTINGS"}
+local navButtons = {"SCRIPT", "ADMIN", "SOUND", "SETTINGS", "CHAT"}
 
 for _, name in ipairs(navButtons) do
     local btn = Instance.new("TextButton")
@@ -169,6 +244,8 @@ for _, name in ipairs(navButtons) do
         ScrollList.Visible = (name == "SCRIPT")
         AdminFrame.Visible = (name == "ADMIN")
         SoundFrame.Visible = (name == "SOUND")
+        SettingsFrame.Visible = (name == "SETTINGS")
+        ChatFrame.Visible = (name == "CHAT")
     end)
 end
 
@@ -724,6 +801,369 @@ UserInputService.InputChanged:Connect(function(input)
     if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
         updateVolume(input)
     end
+end)
+
+-- ==========================================
+-- KOMPONEN TAB SETTINGS (FITUR BARU TAMBAHAN)
+-- ==========================================
+
+-- Overlay Transparansi Latar Belakang MainFrame
+local BackgroundDarknessOverlay = Instance.new("Frame")
+BackgroundDarknessOverlay.Name = "BackgroundDarknessOverlay"
+BackgroundDarknessOverlay.Size = UDim2.new(1, 0, 1, 0)
+BackgroundDarknessOverlay.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+BackgroundDarknessOverlay.BackgroundTransparency = 1
+BackgroundDarknessOverlay.ZIndex = 0
+BackgroundDarknessOverlay.Parent = MainFrame
+
+local DarkOverlayCorner = Instance.new("UICorner")
+DarkOverlayCorner.CornerRadius = UDim.new(0, 10)
+DarkOverlayCorner.Parent = BackgroundDarknessOverlay
+
+-- Helper Function Pembuat Option Toggle SETTINGS
+local function createSettingToggle(posY, textTitle, defaultState, callback)
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 310, 0, 42)
+    frame.Position = UDim2.new(0, 12, 0, posY)
+    frame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+    frame.BackgroundTransparency = 0.2
+    frame.Parent = SettingsFrame
+
+    local fCorner = Instance.new("UICorner")
+    fCorner.CornerRadius = UDim.new(0, 8)
+    fCorner.Parent = frame
+
+    local fStroke = Instance.new("UIStroke")
+    fStroke.Thickness = 1.5
+    fStroke.Color = Color3.fromRGB(0, 255, 180)
+    fStroke.Parent = frame
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0, 200, 1, 0)
+    label.Position = UDim2.new(0, 10, 0, 0)
+    label.BackgroundTransparency = 1
+    label.Text = textTitle
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.TextSize = 16
+    label.Font = Enum.Font.FredokaOne
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = frame
+
+    local toggleBtn = Instance.new("TextButton")
+    toggleBtn.Size = UDim2.new(0, 85, 0, 30)
+    toggleBtn.Position = UDim2.new(1, -92, 0.5, -15)
+    toggleBtn.Font = Enum.Font.FredokaOne
+    toggleBtn.TextSize = 15
+    toggleBtn.Parent = frame
+
+    local tCorner = Instance.new("UICorner")
+    tCorner.CornerRadius = UDim.new(0, 6)
+    tCorner.Parent = toggleBtn
+
+    local state = defaultState or false
+
+    local function updateVisual()
+        if state then
+            toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+            toggleBtn.Text = "ON"
+            toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        else
+            toggleBtn.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
+            toggleBtn.Text = "OFF"
+            toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        end
+    end
+
+    updateVisual()
+
+    toggleBtn.MouseButton1Click:Connect(function()
+        state = not state
+        updateVisual()
+        if callback then
+            callback(state)
+        end
+    end)
+
+    return toggleBtn
+end
+
+-- 1. FPS120 Toggle
+createSettingToggle(10, "FPS120", false, function(isOn)
+    pcall(function()
+        if setfpscap then
+            setfpscap(isOn and 120 or 60)
+        end
+    end)
+end)
+
+-- 2. HD/4K Toggle
+local originalLightingProps = {
+    GlobalShadows = Lighting.GlobalShadows,
+    Technology = Lighting.Technology
+}
+
+createSettingToggle(60, "HD/4K", false, function(isOn)
+    if isOn then
+        Lighting.GlobalShadows = true
+        pcall(function() Lighting.Technology = Enum.Technology.Future end)
+        
+        if not Lighting:FindFirstChild("HD_Bloom") then
+            local bloom = Instance.new("BloomEffect")
+            bloom.Name = "HD_Bloom"
+            bloom.Intensity = 1
+            bloom.Size = 24
+            bloom.Threshold = 0.8
+            bloom.Parent = Lighting
+        end
+        if not Lighting:FindFirstChild("HD_SunRays") then
+            local sunRays = Instance.new("SunRaysEffect")
+            sunRays.Name = "HD_SunRays"
+            sunRays.Intensity = 0.25
+            sunRays.Spread = 1
+            sunRays.Parent = Lighting
+        end
+    else
+        Lighting.GlobalShadows = originalLightingProps.GlobalShadows
+        if Lighting:FindFirstChild("HD_Bloom") then Lighting.HD_Bloom:Destroy() end
+        if Lighting:FindFirstChild("HD_SunRays") then Lighting.HD_SunRays:Destroy() end
+    end
+end)
+
+-- 3. GF MINECRAFT Toggle
+createSettingToggle(110, "GF MINECRAFT", false, function(isOn)
+    if isOn then
+        Lighting.GlobalShadows = false
+        Lighting.FogEnd = 9e9
+        for _, v in ipairs(Lighting:GetChildren()) do
+            if v:IsA("PostEffect") then
+                v.Enabled = false
+            end
+        end
+        for _, part in ipairs(workspace:GetDescendants()) do
+            if part:IsA("BasePart") and not part:IsA("Terrain") then
+                part.Material = Enum.Material.SmoothPlastic
+            end
+        end
+    else
+        Lighting.GlobalShadows = originalLightingProps.GlobalShadows
+        for _, v in ipairs(Lighting:GetChildren()) do
+            if v:IsA("PostEffect") then
+                v.Enabled = true
+            end
+        end
+    end
+end)
+
+-- 4. KEGELAPAN Slider (0% - 100%)
+local DarkFrame = Instance.new("Frame")
+DarkFrame.Size = UDim2.new(0, 310, 0, 55)
+DarkFrame.Position = UDim2.new(0, 12, 0, 160)
+DarkFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+DarkFrame.BackgroundTransparency = 0.2
+DarkFrame.Parent = SettingsFrame
+
+local DarkCorner = Instance.new("UICorner")
+DarkCorner.CornerRadius = UDim.new(0, 8)
+DarkCorner.Parent = DarkFrame
+
+local DarkStroke = Instance.new("UIStroke")
+DarkStroke.Thickness = 1.5
+DarkStroke.Color = Color3.fromRGB(0, 255, 180)
+DarkStroke.Parent = DarkFrame
+
+local DarkLabel = Instance.new("TextLabel")
+DarkLabel.Size = UDim2.new(1, -20, 0, 22)
+DarkLabel.Position = UDim2.new(0, 10, 0, 5)
+DarkLabel.BackgroundTransparency = 1
+DarkLabel.Text = "KEGELAPAN JENDELA (0%)"
+DarkLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+DarkLabel.TextSize = 14
+DarkLabel.Font = Enum.Font.FredokaOne
+DarkLabel.TextXAlignment = Enum.TextXAlignment.Left
+DarkLabel.Parent = DarkFrame
+
+local DarkBar = Instance.new("Frame")
+DarkBar.Size = UDim2.new(1, -20, 0, 8)
+DarkBar.Position = UDim2.new(0, 10, 0, 34)
+DarkBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+DarkBar.BorderSizePixel = 0
+DarkBar.Parent = DarkFrame
+
+local DarkBarCorner = Instance.new("UICorner")
+DarkBarCorner.CornerRadius = UDim.new(0, 4)
+DarkBarCorner.Parent = DarkBar
+
+local DarkTrigger = Instance.new("TextButton")
+DarkTrigger.Size = UDim2.new(1, 0, 1, 14)
+DarkTrigger.Position = UDim2.new(0, 0, 0, -3)
+DarkTrigger.BackgroundTransparency = 1
+DarkTrigger.Text = ""
+DarkTrigger.Parent = DarkBar
+
+local DarkKnob = Instance.new("Frame")
+DarkKnob.Size = UDim2.new(0, 16, 0, 16)
+DarkKnob.Position = UDim2.new(0, -8, 0.5, -8)
+DarkKnob.BackgroundColor3 = Color3.fromRGB(0, 255, 180)
+DarkKnob.BorderSizePixel = 0
+DarkKnob.Active = false
+DarkKnob.Parent = DarkBar
+
+local DarkKnobCorner = Instance.new("UICorner")
+DarkKnobCorner.CornerRadius = UDim.new(1, 0)
+DarkKnobCorner.Parent = DarkKnob
+
+local draggingDark = false
+
+local function updateDarkness(input)
+    local barPos = DarkBar.AbsolutePosition.X
+    local barSize = DarkBar.AbsoluteSize.X
+    local mousePos = input.Position.X
+    local percent = math.clamp((mousePos - barPos) / barSize, 0, 1)
+
+    DarkKnob.Position = UDim2.new(percent, -8, 0.5, -8)
+    DarkLabel.Text = "KEGELAPAN JENDELA (" .. math.floor(percent * 100) .. "%)"
+    BackgroundDarknessOverlay.BackgroundTransparency = 1 - percent
+end
+
+DarkTrigger.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        draggingDark = true
+        MainFrame.Draggable = false
+        updateDarkness(input)
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if draggingDark then
+            draggingDark = false
+            MainFrame.Draggable = true
+        end
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if draggingDark and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        updateDarkness(input)
+    end
+end)
+
+-- ==========================================
+-- SISTEM CHAT GLOBAL (IN-SCRIPT NETWORK)
+-- ==========================================
+
+local CHAT_TOPIC = "LipzyHubV5_GlobalChat"
+
+local function addChatMessage(username, userId, message, isLocal)
+    local msgCard = Instance.new("Frame")
+    msgCard.Size = UDim2.new(1, 0, 0, 60)
+    msgCard.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+    msgCard.BackgroundTransparency = 0.2
+    msgCard.Parent = ChatScrollList
+
+    local cardCorner = Instance.new("UICorner")
+    cardCorner.CornerRadius = UDim.new(0, 8)
+    cardCorner.Parent = msgCard
+
+    local cardStroke = Instance.new("UIStroke")
+    cardStroke.Thickness = 1.5
+    cardStroke.Color = isLocal and Color3.fromRGB(0, 255, 180) or Color3.fromRGB(100, 100, 100)
+    cardStroke.Parent = msgCard
+
+    -- Foto Profil Roblox (Bundar)
+    local profileImg = Instance.new("ImageLabel")
+    profileImg.Size = UDim2.new(0, 40, 0, 40)
+    profileImg.Position = UDim2.new(0, 8, 0, 10)
+    profileImg.BackgroundTransparency = 1
+    profileImg.Image = "rbxthumb://type=AvatarHeadShot&id=" .. userId .. "&w=150&h=150"
+    profileImg.Parent = msgCard
+
+    local profileCorner = Instance.new("UICorner")
+    profileCorner.CornerRadius = UDim.new(1, 0) -- Membuat profil benar-benar bundar
+    profileCorner.Parent = profileImg
+
+    -- Username
+    local userLabel = Instance.new("TextLabel")
+    userLabel.Size = UDim2.new(1, -60, 0, 20)
+    userLabel.Position = UDim2.new(0, 55, 0, 8)
+    userLabel.BackgroundTransparency = 1
+    userLabel.Text = username .. (isLocal and " (Kamu)" or "")
+    userLabel.TextColor3 = isLocal and Color3.fromRGB(0, 255, 180) or Color3.fromRGB(255, 255, 255)
+    userLabel.TextSize = 14
+    userLabel.Font = Enum.Font.FredokaOne
+    userLabel.TextXAlignment = Enum.TextXAlignment.Left
+    userLabel.Parent = msgCard
+
+    -- Isi Pesan
+    local msgLabel = Instance.new("TextLabel")
+    msgLabel.Size = UDim2.new(1, -60, 0, 30)
+    msgLabel.Position = UDim2.new(0, 55, 0, 26)
+    msgLabel.BackgroundTransparency = 1
+    msgLabel.Text = message
+    msgLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    msgLabel.TextSize = 14
+    msgLabel.Font = Enum.Font.FredokaOne
+    msgLabel.TextXAlignment = Enum.TextXAlignment.Left
+    msgLabel.TextWrapped = true
+    msgLabel.Parent = msgCard
+
+    -- Auto scroll ke bawah
+    task.spawn(function()
+        task.wait(0.1)
+        ChatScrollList.CanvasPosition = Vector2.new(0, ChatScrollList.AbsoluteCanvasSize.Y)
+    end)
+
+    -- Batasi jumlah pesan (max 50) untuk mencegah lag
+    local children = ChatScrollList:GetChildren()
+    local frameCount = 0
+    for _, child in ipairs(children) do
+        if child:IsA("Frame") then
+            frameCount += 1
+            if frameCount > 50 then
+                child:Destroy()
+            end
+        end
+    end
+end
+
+-- Event saat tombol kirim ditekan
+ChatSendBtn.MouseButton1Click:Connect(function()
+    local msg = ChatInput.Text
+    if msg == "" or msg:match("^%s*$") then return end
+    
+    local payload = {
+        Username = LocalPlayer.Name,
+        UserId = LocalPlayer.UserId,
+        Message = msg
+    }
+    
+    -- Tampilkan di lokal dulu
+    addChatMessage(payload.Username, payload.UserId, payload.Message, true)
+    
+    -- Publish ke MessagingService agar orang lain di server lain / sama bisa lihat
+    pcall(function()
+        MessagingService:PublishAsync(CHAT_TOPIC, payload)
+    end)
+    
+    ChatInput.Text = ""
+end)
+
+-- Enter untuk kirim
+ChatInput.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        ChatSendBtn.MouseButton1Click:Fire()
+    end
+end)
+
+-- Subscribe ke MessagingService (Menerima pesan dari pengguna script lain)
+pcall(function()
+    MessagingService:SubscribeAsync(CHAT_TOPIC, function(data)
+        local payload = data.Data
+        -- Jangan tampilkan pesan sendiri dua kali
+        if payload.UserId ~= LocalPlayer.UserId then
+            addChatMessage(payload.Username, payload.UserId, payload.Message, false)
+        end
+    end)
 end)
 
 -- ==========================================
