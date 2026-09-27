@@ -297,10 +297,17 @@ AdminWarning.Size = UDim2.new(0, 310, 0, 25)
 AdminWarning.Position = UDim2.new(0, 12, 0, 120)
 AdminWarning.BackgroundTransparency = 1
 AdminWarning.Text = ""
-AdminWarning.TextColor3 = Color3.fromRGB(255, 80, 80)
+AdminWarning.TextColor3 = Color3.fromRGB(255, 50, 50) -- Merah Terang
 AdminWarning.TextSize = 15
 AdminWarning.Font = Enum.Font.FredokaOne
 AdminWarning.Parent = AdminFrame
+
+-- UIStroke untuk pinggiran warna hitam pada teks peringatan admin
+local AdminWarningStroke = Instance.new("UIStroke")
+AdminWarningStroke.Thickness = 2
+AdminWarningStroke.Color = Color3.fromRGB(0, 0, 0) -- Warna Hitam
+AdminWarningStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+AdminWarningStroke.Parent = AdminWarning
 
 -- Tombol NPC (LIPZY HUB)
 local NpcBtn = Instance.new("TextButton")
