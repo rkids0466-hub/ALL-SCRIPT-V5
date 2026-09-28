@@ -24,7 +24,8 @@ local MainFrame = Instance.new("ImageLabel")
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 500, 0, 400)
 MainFrame.Position = UDim2.new(0.5, -250, 0.5, -200)
-MainFrame.Image = "rbxassetid://115370825971274"
+-- DIUBAH: ID Banner Background Utama menjadi 88880311850477
+MainFrame.Image = "rbxassetid://88880311850477"
 MainFrame.ScaleType = Enum.ScaleType.Crop
 MainFrame.Active = true
 MainFrame.Draggable = true
@@ -80,7 +81,8 @@ end)
 local LogoImage = Instance.new("ImageLabel")
 LogoImage.Size = UDim2.new(0, 110, 0, 110)
 LogoImage.Position = UDim2.new(0, 15, 0, 15)
-LogoImage.Image = "rbxassetid://106266705371695"
+-- DIUBAH: ID Gambar Logo Kiri Atas menjadi 96630662046740
+LogoImage.Image = "rbxassetid://96630662046740"
 LogoImage.BackgroundTransparency = 1
 LogoImage.Parent = MainFrame
 
@@ -985,7 +987,7 @@ end)
 -- ANIMASI & LOOPING
 -- ==========================================
 
--- Label Animasi Mengetik "LIPZY HUB V5"
+-- Label Animasi Mengetik "LIPZY HUB V5.2"
 local TitleAnim = Instance.new("TextLabel")
 TitleAnim.Size = UDim2.new(0, 335, 0, 30)
 TitleAnim.Position = UDim2.new(0, 145, 0, 355)
@@ -1004,7 +1006,8 @@ TitleStroke.Parent = TitleAnim
 
 -- Efek Typing Animation Loop
 task.spawn(function()
-    local fullText = "LIPZY HUB V5"
+    -- DIUBAH: Teks animasi di bagian bawah menjadi V5.2
+    local fullText = "LIPZY HUB V5.2"
     while task.wait(1) do
         for i = 1, #fullText do
             TitleAnim.Text = string.sub(fullText, 1, i)
