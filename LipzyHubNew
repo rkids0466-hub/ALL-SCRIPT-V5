@@ -506,6 +506,123 @@ NpcBtn.MouseButton1Click:Connect(function()
     end)
 end)
 
+
+-- ==========================================
+-- FITUR CREATOR LIPZY HUB (TOMBOL PERSEGI STYLE)
+-- ==========================================
+local ownerBillboard = nil
+local ownerEnabled = false
+
+local function createOwnerBillboard()
+    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local head = character:FindFirstChild("Head")
+    if not head then return end
+
+    -- Hapus billboard lama jika ada
+    if ownerBillboard and ownerBillboard.Parent then
+        ownerBillboard:Destroy()
+    end
+
+    local bb = Instance.new("BillboardGui")
+    bb.Name = "OwnerCrown"
+    bb.Size = UDim2.new(0, 200, 0, 60)
+    bb.StudsOffset = Vector3.new(0, 3, 0)
+    bb.AlwaysOnTop = true
+    bb.Adornee = head
+    bb.Parent = head
+
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(1, 0, 1, 0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = "👑OWNER👑"
+    lbl.TextColor3 = Color3.fromRGB(255, 215, 0)
+    lbl.TextScaled = true
+    lbl.Font = Enum.Font.FredokaOne
+    lbl.Parent = bb
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Thickness = 2
+    stroke.Color = Color3.fromRGB(0, 0, 0)
+    stroke.Parent = lbl
+
+    ownerBillboard = bb
+end
+
+local function removeOwnerBillboard()
+    if ownerBillboard and ownerBillboard.Parent then
+        ownerBillboard:Destroy()
+    end
+    ownerBillboard = nil
+end
+
+-- Re-attach saat respawn karakter
+LocalPlayer.CharacterAdded:Connect(function(char)
+    task.wait(0.5)
+    if ownerEnabled then
+        createOwnerBillboard()
+    end
+end)
+
+-- Tombol persegi gaya sama seperti toggle settings
+local CreatorFrame = Instance.new("Frame")
+CreatorFrame.Size = UDim2.new(0, 310, 0, 42)
+CreatorFrame.Position = UDim2.new(0, 12, 0, 205)
+CreatorFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+CreatorFrame.BackgroundTransparency = 0.2
+CreatorFrame.Parent = AdminFrame
+
+local cCorner = Instance.new("UICorner")
+cCorner.CornerRadius = UDim.new(0, 8)
+cCorner.Parent = CreatorFrame
+
+local cStroke = Instance.new("UIStroke")
+cStroke.Thickness = 1.5
+cStroke.Color = Color3.fromRGB(0, 255, 180)
+cStroke.Parent = CreatorFrame
+
+local cLabel = Instance.new("TextLabel")
+cLabel.Size = UDim2.new(0, 200, 1, 0)
+cLabel.Position = UDim2.new(0, 10, 0, 0)
+cLabel.BackgroundTransparency = 1
+cLabel.Text = "CREATOR LIPZY HUB"
+cLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+cLabel.TextSize = 16
+cLabel.Font = Enum.Font.FredokaOne
+cLabel.TextXAlignment = Enum.TextXAlignment.Left
+cLabel.Parent = CreatorFrame
+
+local cToggle = Instance.new("TextButton")
+cToggle.Size = UDim2.new(0, 85, 0, 30)
+cToggle.Position = UDim2.new(1, -92, 0.5, -15)
+cToggle.Font = Enum.Font.FredokaOne
+cToggle.TextSize = 15
+cToggle.Text = "OFF"
+cToggle.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
+cToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+cToggle.Parent = CreatorFrame
+
+local ctCorner = Instance.new("UICorner")
+ctCorner.CornerRadius = UDim.new(0, 6)
+ctCorner.Parent = cToggle
+
+cToggle.MouseButton1Click:Connect(function()
+    if LocalPlayer.Name ~= "LifzxAfter2" then
+        AdminWarning.Text = "you are not the owner"
+        return
+    end
+    AdminWarning.Text = ""
+    ownerEnabled = not ownerEnabled
+    if ownerEnabled then
+        cToggle.Text = "ON"
+        cToggle.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+        createOwnerBillboard()
+    else
+        cToggle.Text = "OFF"
+        cToggle.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
+        removeOwnerBillboard()
+    end
+end)
+
 -- ==========================================
 -- KOMPONEN TAB SOUND
 -- ==========================================
@@ -889,10 +1006,232 @@ createSettingToggle(110, "GF MINECRAFT", false, function(isOn)
     end
 end)
 
+-- ==========================================
+-- FITUR BLOOD MOON (TOMBOL PERSEGI STYLE)
+-- ==========================================
+local bloodMoonActive = false
+local bloodParts = {}   -- daftar Part/objek yang dibuat saat aktif
+local bloodEffects = {} -- daftar PostEffect yang dibuat saat aktif
+local bloodEmoteThread = nil
+
+local originalSkyProps = {
+    Ambient = Lighting.Ambient,
+    OutdoorAmbient = Lighting.OutdoorAmbient,
+    FogColor = Lighting.FogColor,
+    FogEnd = Lighting.FogEnd,
+    Brightness = Lighting.Brightness,
+}
+
+local function cleanupBloodMoon()
+    if bloodEmoteThread then
+        pcall(function() task.cancel(bloodEmoteThread) end)
+        bloodEmoteThread = nil
+    end
+    for _, obj in ipairs(bloodParts) do
+        pcall(function() obj:Destroy() end)
+    end
+    table.clear(bloodParts)
+    for _, fx in ipairs(bloodEffects) do
+        pcall(function() fx:Destroy() end)
+    end
+    table.clear(bloodEffects)
+    -- Kembalikan properti lighting awal
+    pcall(function()
+        Lighting.Ambient = originalSkyProps.Ambient
+        Lighting.OutdoorAmbient = originalSkyProps.OutdoorAmbient
+        Lighting.FogColor = originalSkyProps.FogColor
+        Lighting.FogEnd = originalSkyProps.FogEnd
+        Lighting.Brightness = originalSkyProps.Brightness
+    end)
+end
+
+local function activateBloodMoon()
+    -- 1. Langit / ambience merah darah
+    pcall(function()
+        Lighting.Ambient = Color3.fromRGB(80, 0, 0)
+        Lighting.OutdoorAmbient = Color3.fromRGB(40, 0, 0)
+        Lighting.FogColor = Color3.fromRGB(60, 0, 0)
+        Lighting.FogEnd = 9e9
+        Lighting.Brightness = 1.5
+    end)
+
+    local cc = Instance.new("ColorCorrectionEffect")
+    cc.Name = "BM_Color"
+    cc.TintColor = Color3.fromRGB(255, 60, 60)
+    cc.Saturation = 0.4
+    cc.Brightness = -0.05
+    cc.Parent = Lighting
+    table.insert(bloodEffects, cc)
+
+    -- Sky custom merah + bulan besar di langit
+    local sky = Instance.new("Sky")
+    sky.Name = "BM_Sky"
+    sky.SkyboxBk = "rbxassetid://107185573"
+    sky.SkyboxDn = "rbxassetid://107185573"
+    sky.SkyboxFt = "rbxassetid://107185573"
+    sky.SkyboxLf = "rbxassetid://107185573"
+    sky.SkyboxRt = "rbxassetid://107185573"
+    sky.SkyboxUp = "rbxassetid://107185573"
+    sky.StarCount = 0
+    sky.CelestialBodiesShown = true
+    sky.MoonSizeScale = 12          -- bulan jadi BESAR
+    sky.MoonColor = Color3.fromRGB(255, 30, 30)  -- bulan MERAH
+    sky.SunSizeScale = 1
+    sky.SunInclination = 0.5
+    sky.Parent = Lighting
+    table.insert(bloodEffects, sky)
+
+    -- 2. Avatar besar LifzxAfter2 di ujung luar zona aman
+    local camCF = workspace.CurrentCamera and workspace.CurrentCamera.CFrame or CFrame.new(0, 0, 0)
+    local farPos = camCF * CFrame.new(0, 0, -300) + Vector3.new(0, 60, 0)
+
+    local avatarModel
+    local okM, m = pcall(function()
+        return Players:CreateHumanoidModelFromUserId(7860161471)
+    end)
+    if okM and m then
+        avatarModel = m
+    else
+        avatarModel = Instance.new("Model")
+        avatarModel.Name = "LifzxAfter2"
+        local hrp = Instance.new("Part")
+        hrp.Name = "HumanoidRootPart"
+        hrp.Size = Vector3.new(2, 2, 1)
+        hrp.Anchored = true
+        hrp.CanCollide = false
+        hrp.Transparency = 1
+        hrp.Parent = avatarModel
+        avatarModel.PrimaryPart = hrp
+        local hum = Instance.new("Humanoid")
+        hum.Parent = avatarModel
+    end
+    avatarModel.Name = "LifzxAfter2_BM"
+    pcall(function()
+        avatarModel:SetPrimaryPartCFrame(CFrame.new(farPos) * CFrame.Angles(0, math.rad(180), 0))
+    end)
+    avatarModel.Parent = workspace
+    table.insert(bloodParts, avatarModel)
+
+    -- Perbesar avatar agar terlihat dari jauh
+    pcall(function()
+        local hum = avatarModel:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.BodyDepthScale = 4
+            hum.BodyHeightScale = 4
+            hum.BodyWidthScale = 4
+            hum.HeadScale = 4
+        end
+    end)
+
+    -- Tulisan besar "ADMIN EVEN" di atas avatar
+    local head = avatarModel:FindFirstChild("Head")
+    if head then
+        local bb = Instance.new("BillboardGui")
+        bb.Name = "BM_Text"
+        bb.Size = UDim2.new(0, 600, 0, 150)
+        bb.StudsOffset = Vector3.new(0, 12, 0)
+        bb.AlwaysOnTop = true
+        bb.Adornee = head
+        bb.Parent = head
+        table.insert(bloodParts, bb)
+
+        local lbl = Instance.new("TextLabel")
+        lbl.Size = UDim2.new(1, 0, 1, 0)
+        lbl.BackgroundTransparency = 1
+        lbl.Text = "ADMIN EVEN"
+        lbl.TextColor3 = Color3.fromRGB(255, 40, 40)
+        lbl.TextScaled = true
+        lbl.Font = Enum.Font.FredokaOne
+        lbl.Parent = bb
+
+        local st = Instance.new("UIStroke")
+        st.Thickness = 4
+        st.Color = Color3.fromRGB(0, 0, 0)
+        st.Parent = lbl
+    end
+
+    -- 3. Loop emote / menari ("emot emot & menunggu/mengamuk")
+    local emoteIds = {
+        507770239, 507770913, 507771481, 507771813, 507767716, 507768307,
+    }
+    bloodEmoteThread = task.spawn(function()
+        while bloodMoonActive do
+            local hum = avatarModel:FindFirstChildOfClass("Humanoid")
+            if hum then
+                local animId = emoteIds[math.random(1, #emoteIds)]
+                local anim = Instance.new("Animation")
+                anim.AnimationId = "rbxassetid://" .. tostring(animId)
+                local track = hum:LoadAnimation(anim)
+                track:Play()
+                task.wait(3)
+                pcall(function() track:Stop() end)
+                pcall(function() anim:Destroy() end)
+            else
+                task.wait(1)
+            end
+        end
+    end)
+end
+
+-- Tombol persegi sama seperti FPS120..GF MINECRAFT
+local BloodFrame = Instance.new("Frame")
+BloodFrame.Size = UDim2.new(0, 310, 0, 42)
+BloodFrame.Position = UDim2.new(0, 12, 0, 160)
+BloodFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+BloodFrame.BackgroundTransparency = 0.2
+BloodFrame.Parent = SettingsFrame
+
+local bCorner = Instance.new("UICorner")
+bCorner.CornerRadius = UDim.new(0, 8)
+bCorner.Parent = BloodFrame
+
+local bStroke = Instance.new("UIStroke")
+bStroke.Thickness = 1.5
+bStroke.Color = Color3.fromRGB(0, 255, 180)
+bStroke.Parent = BloodFrame
+
+local bLabel = Instance.new("TextLabel")
+bLabel.Size = UDim2.new(0, 200, 1, 0)
+bLabel.Position = UDim2.new(0, 10, 0, 0)
+bLabel.BackgroundTransparency = 1
+bLabel.Text = "BLOOD MOON"
+bLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+bLabel.TextSize = 16
+bLabel.Font = Enum.Font.FredokaOne
+bLabel.TextXAlignment = Enum.TextXAlignment.Left
+bLabel.Parent = BloodFrame
+
+local bToggle = Instance.new("TextButton")
+bToggle.Size = UDim2.new(0, 85, 0, 30)
+bToggle.Position = UDim2.new(1, -92, 0.5, -15)
+bToggle.Font = Enum.Font.FredokaOne
+bToggle.TextSize = 15
+bToggle.Text = "OFF"
+bToggle.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
+bToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+bToggle.Parent = BloodFrame
+
+local btCorner = Instance.new("UICorner")
+btCorner.CornerRadius = UDim.new(0, 6)
+btCorner.Parent = bToggle
+
+bToggle.MouseButton1Click:Connect(function()
+    bloodMoonActive = not bloodMoonActive
+    if bloodMoonActive then
+        bToggle.Text = "ON"
+        bToggle.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+        activateBloodMoon()
+    else
+        bToggle.Text = "OFF"
+        bToggle.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
+        cleanupBloodMoon()
+    end
+end)
+
 -- 4. KEGELAPAN Slider (0% - 100%)
 local DarkFrame = Instance.new("Frame")
 DarkFrame.Size = UDim2.new(0, 310, 0, 55)
-DarkFrame.Position = UDim2.new(0, 12, 0, 160)
+DarkFrame.Position = UDim2.new(0, 12, 0, 210)
 DarkFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
 DarkFrame.BackgroundTransparency = 0.2
 DarkFrame.Parent = SettingsFrame
