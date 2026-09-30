@@ -246,7 +246,11 @@ local noKeylessScripts = {
     {"NIGHT HUB", "https://raw.githubusercontent.com/WhiteX1208/Scripts/refs/heads/main/StealEggOnly.luau"},
     {"BK's HUB", "https://api.luarmor.net/files/v4/loaders/9ee4edde227ac85f50872bf9e4226508.lua"},
     {"LKZ", "https://raw.githubusercontent.com/LucasggkX/LKZ-Hub/refs/heads/main/Loader.lua"},
-    {"CHILI HUB", "https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua"}
+    {"CHILI HUB", "https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua"},
+    -- FITUR BARU DITAMBAHKAN DI BAWAH CHILI HUB
+    {"SENA BETA", "https://senahub.xyz/raw/loader"},
+    {"LENON FIX BUG", "https://api.luarmor.net/files/v4/loaders/4595fe31a5f7a8b4f4dd7071f3119ef7.lua"},
+    {"LENON 2", "https://raw.githubusercontent.com/lennonxscripts/lennonhubv4/refs/heads/main/stealanegg"}
 }
 
 for _, scriptData in ipairs(noKeylessScripts) do
