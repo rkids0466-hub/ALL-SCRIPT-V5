@@ -143,14 +143,30 @@ SoundFrame.BackgroundTransparency = 1
 SoundFrame.Visible = false
 SoundFrame.Parent = MainFrame
 
--- Frame Konten Settings
-local SettingsFrame = Instance.new("Frame")
+-- ==========================================
+-- FRAME KONTEKN SETTINGS (DIUBAH MENJADI SCROLLING FRAME)
+-- ==========================================
+local SettingsFrame = Instance.new("ScrollingFrame")
 SettingsFrame.Name = "SettingsFrame"
 SettingsFrame.Size = UDim2.new(0, 335, 0, 320)
 SettingsFrame.Position = UDim2.new(0, 145, 0, 25)
 SettingsFrame.BackgroundTransparency = 1
+SettingsFrame.BorderSizePixel = 0
+SettingsFrame.ScrollBarThickness = 6
+SettingsFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+SettingsFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
 SettingsFrame.Visible = false
 SettingsFrame.Parent = MainFrame
+
+local SettingsLayout = Instance.new("UIListLayout")
+SettingsLayout.SortOrder = Enum.SortOrder.LayoutOrder
+SettingsLayout.Padding = UDim.new(0, 8) -- Jarak antar menu
+SettingsLayout.Parent = SettingsFrame
+
+local SettingsPadding = Instance.new("UIPadding")
+SettingsPadding.PaddingTop = UDim.new(0, 10)
+SettingsPadding.PaddingBottom = UDim.new(0, 10)
+SettingsPadding.Parent = SettingsFrame
 
 -- Tombol Navigasi Sistem
 local navButtons = {"SCRIPT", "ADMIN", "SOUND", "SETTINGS"}
@@ -247,7 +263,6 @@ local noKeylessScripts = {
     {"BK's HUB", "https://api.luarmor.net/files/v4/loaders/9ee4edde227ac85f50872bf9e4226508.lua"},
     {"LKZ", "https://raw.githubusercontent.com/LucasggkX/LKZ-Hub/refs/heads/main/Loader.lua"},
     {"CHILI HUB", "https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua"},
-    -- FITUR BARU DITAMBAHKAN DI BAWAH CHILI HUB
     {"SENA BETA", "https://senahub.xyz/raw/loader"},
     {"LENON FIX BUG", "https://api.luarmor.net/files/v4/loaders/4595fe31a5f7a8b4f4dd7071f3119ef7.lua"},
     {"LENON 2", "https://raw.githubusercontent.com/lennonxscripts/lennonhubv4/refs/heads/main/stealanegg"}
@@ -276,7 +291,6 @@ end
 -- KOMPONEN TAB ADMIN & SISTEM PESAN / NPC
 -- ==========================================
 
--- Container Pesan Layar Utama
 local BroadcastContainer = Instance.new("Frame")
 BroadcastContainer.Name = "BroadcastContainer"
 BroadcastContainer.Size = UDim2.new(0, 600, 1, 0)
@@ -291,7 +305,6 @@ BroadcastLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 BroadcastLayout.VerticalAlignment = Enum.VerticalAlignment.Top
 BroadcastLayout.Parent = BroadcastContainer
 
--- TextBox Input Message
 local MsgInput = Instance.new("TextBox")
 MsgInput.Size = UDim2.new(0, 310, 0, 45)
 MsgInput.Position = UDim2.new(0, 12, 0, 15)
@@ -315,7 +328,6 @@ MsgInputStroke.Thickness = 2
 MsgInputStroke.Color = Color3.fromRGB(0, 255, 180)
 MsgInputStroke.Parent = MsgInput
 
--- Tombol SEND
 local SendBtn = Instance.new("TextButton")
 SendBtn.Size = UDim2.new(0, 310, 0, 42)
 SendBtn.Position = UDim2.new(0, 12, 0, 70)
@@ -336,7 +348,6 @@ SendBtnStroke.Color = Color3.fromRGB(0, 0, 0)
 SendBtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
 SendBtnStroke.Parent = SendBtn
 
--- Label Warning / Status Admin
 local AdminWarning = Instance.new("TextLabel")
 AdminWarning.Size = UDim2.new(0, 310, 0, 25)
 AdminWarning.Position = UDim2.new(0, 12, 0, 120)
@@ -347,7 +358,6 @@ AdminWarning.TextSize = 15
 AdminWarning.Font = Enum.Font.FredokaOne
 AdminWarning.Parent = AdminFrame
 
--- Tombol NPC (LIPZY HUB)
 local NpcBtn = Instance.new("TextButton")
 NpcBtn.Size = UDim2.new(0, 310, 0, 42)
 NpcBtn.Position = UDim2.new(0, 12, 0, 155)
@@ -369,11 +379,9 @@ NpcBtnStroke.Color = Color3.fromRGB(0, 0, 0)
 NpcBtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
 NpcBtnStroke.Parent = NpcBtn
 
--- Fungsi Broadcast Pesan Admin
 local function sendAdminMessage(msgText)
     if msgText == "" then return end
 
-    -- Frame Pesan (Ukuran Lebar 600)
     local MsgCard = Instance.new("Frame")
     MsgCard.Size = UDim2.new(0, 600, 0, 90)
     MsgCard.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
@@ -389,7 +397,6 @@ local function sendAdminMessage(msgText)
     CardStroke.Color = Color3.fromRGB(0, 255, 180)
     CardStroke.Parent = MsgCard
 
-    -- Foto Profil Roblox (LifzxAfter2)
     local ProfileImg = Instance.new("ImageLabel")
     ProfileImg.Size = UDim2.new(0, 70, 0, 70)
     ProfileImg.Position = UDim2.new(0, 10, 0, 10)
@@ -409,7 +416,6 @@ local function sendAdminMessage(msgText)
     ProfileCorner.CornerRadius = UDim.new(0, 10)
     ProfileCorner.Parent = ProfileImg
 
-    -- Header Title (👑LIPZY HUB👑)
     local HeaderLabel = Instance.new("TextLabel")
     HeaderLabel.Size = UDim2.new(0, 500, 0, 25)
     HeaderLabel.Position = UDim2.new(0, 90, 0, 10)
@@ -421,7 +427,6 @@ local function sendAdminMessage(msgText)
     HeaderLabel.TextXAlignment = Enum.TextXAlignment.Left
     HeaderLabel.Parent = MsgCard
 
-    -- Isi Pesan
     local ContentLabel = Instance.new("TextLabel")
     ContentLabel.Size = UDim2.new(0, 500, 0, 45)
     ContentLabel.Position = UDim2.new(0, 90, 0, 35)
@@ -434,7 +439,6 @@ local function sendAdminMessage(msgText)
     ContentLabel.TextWrapped = true
     ContentLabel.Parent = MsgCard
 
-    -- Suara Admin Abuse
     local sound = Instance.new("Sound")
     sound.SoundId = "rbxassetid://9114223280"
     sound.Volume = 1
@@ -444,7 +448,6 @@ local function sendAdminMessage(msgText)
         sound:Destroy()
     end)
 
-    -- Auto Hilang setelah 6 detik
     task.delay(6, function()
         if MsgCard and MsgCard.Parent then
             MsgCard:Destroy()
@@ -452,7 +455,6 @@ local function sendAdminMessage(msgText)
     end)
 end
 
--- Event Klik Send Message
 SendBtn.MouseButton1Click:Connect(function()
     if LocalPlayer.Name == "LifzxAfter2" then
         AdminWarning.Text = ""
@@ -463,7 +465,6 @@ SendBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Event Klik Spawn NPC
 NpcBtn.MouseButton1Click:Connect(function()
     task.spawn(function()
         local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
@@ -493,13 +494,11 @@ NpcBtn.MouseButton1Click:Connect(function()
         npcModel:SetPrimaryPartCFrame(rootPart.CFrame * CFrame.new(0, 0, -5) * CFrame.Angles(0, math.rad(180), 0))
         npcModel.Parent = workspace
 
-        -- Chat Bubble NPC
         local head = npcModel:FindFirstChild("Head")
         if head then
             game:GetService("Chat"):Chat(head, "HELOW " .. LocalPlayer.Name, Enum.ChatColor.Green)
         end
 
-        -- Animation Emote Hai (Wave)
         local humanoid = npcModel:FindFirstChildOfClass("Humanoid")
         if humanoid then
             local anim = Instance.new("Animation")
@@ -510,9 +509,8 @@ NpcBtn.MouseButton1Click:Connect(function()
     end)
 end)
 
-
 -- ==========================================
--- FITUR CREATOR LIPZY HUB (TOMBOL PERSEGI STYLE)
+-- FITUR CREATOR LIPZY HUB
 -- ==========================================
 local ownerBillboard = nil
 local ownerEnabled = false
@@ -522,7 +520,6 @@ local function createOwnerBillboard()
     local head = character:FindFirstChild("Head")
     if not head then return end
 
-    -- Hapus billboard lama jika ada
     if ownerBillboard and ownerBillboard.Parent then
         ownerBillboard:Destroy()
     end
@@ -559,7 +556,6 @@ local function removeOwnerBillboard()
     ownerBillboard = nil
 end
 
--- Re-attach saat respawn karakter
 LocalPlayer.CharacterAdded:Connect(function(char)
     task.wait(0.5)
     if ownerEnabled then
@@ -567,7 +563,6 @@ LocalPlayer.CharacterAdded:Connect(function(char)
     end
 end)
 
--- Tombol persegi gaya sama seperti toggle settings
 local CreatorFrame = Instance.new("Frame")
 CreatorFrame.Size = UDim2.new(0, 310, 0, 42)
 CreatorFrame.Position = UDim2.new(0, 12, 0, 205)
@@ -664,7 +659,6 @@ local function playCustomSound(id, isLooped)
     end)
 end
 
--- 1. Input ID Sound
 local SoundIdInput = Instance.new("TextBox")
 SoundIdInput.Size = UDim2.new(0, 310, 0, 40)
 SoundIdInput.Position = UDim2.new(0, 12, 0, 10)
@@ -683,7 +677,6 @@ local SoundIdCorner = Instance.new("UICorner")
 SoundIdCorner.CornerRadius = UDim.new(0, 8)
 SoundIdCorner.Parent = SoundIdInput
 
--- 2. Tombol SEND Sound ID
 local SoundSendBtn = Instance.new("TextButton")
 SoundSendBtn.Size = UDim2.new(0, 160, 0, 40)
 SoundSendBtn.Position = UDim2.new(0, 87, 0, 58)
@@ -703,7 +696,6 @@ SoundSendBtn.MouseButton1Click:Connect(function()
     playCustomSound(SoundIdInput.Text, false)
 end)
 
--- 3. Tombol CIKADAP (1x Play)
 local CikadapBtn = Instance.new("TextButton")
 CikadapBtn.Size = UDim2.new(0, 190, 0, 42)
 CikadapBtn.Position = UDim2.new(0, 12, 0, 110)
@@ -723,7 +715,6 @@ CikadapBtn.MouseButton1Click:Connect(function()
     playCustomSound("4004629054", false)
 end)
 
--- 4. Tombol BRAZIL (Loop Play)
 local BrazilBtn = Instance.new("TextButton")
 BrazilBtn.Size = UDim2.new(0, 190, 0, 42)
 BrazilBtn.Position = UDim2.new(0, 12, 0, 162)
@@ -743,7 +734,6 @@ BrazilBtn.MouseButton1Click:Connect(function()
     playCustomSound("84093014695702", true)
 end)
 
--- 5. Toggle ON / OFF Button
 local ToggleBtn = Instance.new("TextButton")
 ToggleBtn.Size = UDim2.new(0, 100, 0, 42)
 ToggleBtn.Position = UDim2.new(0, 215, 0, 110)
@@ -773,7 +763,6 @@ ToggleBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- 6. VOLUME Label & Slider
 local VolumeLabel = Instance.new("TextLabel")
 VolumeLabel.Size = UDim2.new(0, 100, 0, 20)
 VolumeLabel.Position = UDim2.new(0, 215, 0, 162)
@@ -800,7 +789,6 @@ local SliderCorner = Instance.new("UICorner")
 SliderCorner.CornerRadius = UDim.new(0, 3)
 SliderCorner.Parent = SliderBar
 
--- TextButton transparan sebagai penangkap input slider
 local SliderTrigger = Instance.new("TextButton")
 SliderTrigger.Size = UDim2.new(1, 0, 1, 14)
 SliderTrigger.Position = UDim2.new(0, 0, 0, -4)
@@ -820,7 +808,6 @@ local KnobCorner = Instance.new("UICorner")
 KnobCorner.CornerRadius = UDim.new(1, 0)
 KnobCorner.Parent = SliderKnob
 
--- Slider Logic
 local dragging = false
 
 local function updateVolume(input)
@@ -863,7 +850,6 @@ end)
 -- KOMPONEN TAB SETTINGS
 -- ==========================================
 
--- Overlay Transparansi Latar Belakang MainFrame
 local BackgroundDarknessOverlay = Instance.new("Frame")
 BackgroundDarknessOverlay.Name = "BackgroundDarknessOverlay"
 BackgroundDarknessOverlay.Size = UDim2.new(1, 0, 1, 0)
@@ -876,11 +862,11 @@ local DarkOverlayCorner = Instance.new("UICorner")
 DarkOverlayCorner.CornerRadius = UDim.new(0, 10)
 DarkOverlayCorner.Parent = BackgroundDarknessOverlay
 
--- Helper Function Pembuat Option Toggle SETTINGS
-local function createSettingToggle(posY, textTitle, defaultState, callback)
+-- Helper Function Pembuat Option Toggle SETTINGS (DISEDERHANAKAN UNTUK UIListLayout)
+local function createSettingToggle(textTitle, defaultState, callback)
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(0, 310, 0, 42)
-    frame.Position = UDim2.new(0, 12, 0, posY)
+    -- Posisi diatur otomatis oleh UIListLayout, tidak perlu manual
     frame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
     frame.BackgroundTransparency = 0.2
     frame.Parent = SettingsFrame
@@ -944,7 +930,7 @@ local function createSettingToggle(posY, textTitle, defaultState, callback)
 end
 
 -- 1. FPS120 Toggle
-createSettingToggle(10, "FPS120", false, function(isOn)
+createSettingToggle("FPS120", false, function(isOn)
     pcall(function()
         if setfpscap then
             setfpscap(isOn and 120 or 60)
@@ -958,7 +944,7 @@ local originalLightingProps = {
     Technology = Lighting.Technology
 }
 
-createSettingToggle(60, "HD/4K", false, function(isOn)
+createSettingToggle("HD/4K", false, function(isOn)
     if isOn then
         Lighting.GlobalShadows = true
         pcall(function() Lighting.Technology = Enum.Technology.Future end)
@@ -986,7 +972,7 @@ createSettingToggle(60, "HD/4K", false, function(isOn)
 end)
 
 -- 3. GF MINECRAFT Toggle
-createSettingToggle(110, "GF MINECRAFT", false, function(isOn)
+createSettingToggle("GF MINECRAFT", false, function(isOn)
     if isOn then
         Lighting.GlobalShadows = false
         Lighting.FogEnd = 9e9
@@ -1011,11 +997,11 @@ createSettingToggle(110, "GF MINECRAFT", false, function(isOn)
 end)
 
 -- ==========================================
--- FITUR BLOOD MOON (TOMBOL PERSEGI STYLE)
+-- FITUR BLOOD MOON
 -- ==========================================
 local bloodMoonActive = false
-local bloodParts = {}   -- daftar Part/objek yang dibuat saat aktif
-local bloodEffects = {} -- daftar PostEffect yang dibuat saat aktif
+local bloodParts = {}
+local bloodEffects = {}
 local bloodEmoteThread = nil
 
 local originalSkyProps = {
@@ -1039,7 +1025,6 @@ local function cleanupBloodMoon()
         pcall(function() fx:Destroy() end)
     end
     table.clear(bloodEffects)
-    -- Kembalikan properti lighting awal
     pcall(function()
         Lighting.Ambient = originalSkyProps.Ambient
         Lighting.OutdoorAmbient = originalSkyProps.OutdoorAmbient
@@ -1050,7 +1035,6 @@ local function cleanupBloodMoon()
 end
 
 local function activateBloodMoon()
-    -- 1. Langit / ambience merah darah
     pcall(function()
         Lighting.Ambient = Color3.fromRGB(80, 0, 0)
         Lighting.OutdoorAmbient = Color3.fromRGB(40, 0, 0)
@@ -1067,7 +1051,6 @@ local function activateBloodMoon()
     cc.Parent = Lighting
     table.insert(bloodEffects, cc)
 
-    -- Sky custom merah + bulan besar di langit
     local sky = Instance.new("Sky")
     sky.Name = "BM_Sky"
     sky.SkyboxBk = "rbxassetid://107185573"
@@ -1078,14 +1061,13 @@ local function activateBloodMoon()
     sky.SkyboxUp = "rbxassetid://107185573"
     sky.StarCount = 0
     sky.CelestialBodiesShown = true
-    sky.MoonSizeScale = 12          -- bulan jadi BESAR
-    sky.MoonColor = Color3.fromRGB(255, 30, 30)  -- bulan MERAH
+    sky.MoonSizeScale = 12
+    sky.MoonColor = Color3.fromRGB(255, 30, 30)
     sky.SunSizeScale = 1
     sky.SunInclination = 0.5
     sky.Parent = Lighting
     table.insert(bloodEffects, sky)
 
-    -- 2. Avatar besar LifzxAfter2 di ujung luar zona aman
     local camCF = workspace.CurrentCamera and workspace.CurrentCamera.CFrame or CFrame.new(0, 0, 0)
     local farPos = camCF * CFrame.new(0, 0, -300) + Vector3.new(0, 60, 0)
 
@@ -1116,7 +1098,6 @@ local function activateBloodMoon()
     avatarModel.Parent = workspace
     table.insert(bloodParts, avatarModel)
 
-    -- Perbesar avatar agar terlihat dari jauh
     pcall(function()
         local hum = avatarModel:FindFirstChildOfClass("Humanoid")
         if hum then
@@ -1127,7 +1108,6 @@ local function activateBloodMoon()
         end
     end)
 
-    -- Tulisan besar "ADMIN EVEN" di atas avatar
     local head = avatarModel:FindFirstChild("Head")
     if head then
         local bb = Instance.new("BillboardGui")
@@ -1154,10 +1134,7 @@ local function activateBloodMoon()
         st.Parent = lbl
     end
 
-    -- 3. Loop emote / menari ("emot emot & menunggu/mengamuk")
-    local emoteIds = {
-        507770239, 507770913, 507771481, 507771813, 507767716, 507768307,
-    }
+    local emoteIds = {507770239, 507770913, 507771481, 507771813, 507767716, 507768307}
     bloodEmoteThread = task.spawn(function()
         while bloodMoonActive do
             local hum = avatarModel:FindFirstChildOfClass("Humanoid")
@@ -1177,10 +1154,9 @@ local function activateBloodMoon()
     end)
 end
 
--- Tombol persegi sama seperti FPS120..GF MINECRAFT
 local BloodFrame = Instance.new("Frame")
 BloodFrame.Size = UDim2.new(0, 310, 0, 42)
-BloodFrame.Position = UDim2.new(0, 12, 0, 160)
+-- Posisi diatur otomatis oleh UIListLayout
 BloodFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
 BloodFrame.BackgroundTransparency = 0.2
 BloodFrame.Parent = SettingsFrame
@@ -1232,10 +1208,137 @@ bToggle.MouseButton1Click:Connect(function()
     end
 end)
 
+-- ==========================================
+-- FITUR TAMBAHAN: ANTI-WEIGHT, 1TAP EGG, ANTI GUARD
+-- ==========================================
+
+-- 1. ANTI-WEIGHT
+local antiWeightConn = nil
+createSettingToggle("ANTI-WEIGHT", false, function(isOn)
+    if isOn then
+        antiWeightConn = RunService.Heartbeat:Connect(function()
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChild("Humanoid") then
+                char.Humanoid.WalkSpeed = 16 
+                char.Humanoid.JumpPower = 50
+            end
+        end)
+    else
+        if antiWeightConn then
+            antiWeightConn:Disconnect()
+            antiWeightConn = nil
+        end
+    end
+end)
+
+-- 2. 1TAP EGG
+local oneTapEggConn = nil
+createSettingToggle("1TAP EGG", false, function(isOn)
+    if isOn then
+        -- Tambahan: Membuat layar halus seperti 120fps saat diaktifkan
+        pcall(function() 
+            if setfpscap then 
+                setfpscap(120) 
+            end 
+        end)
+        
+        oneTapEggConn = RunService.RenderStepped:Connect(function()
+            local char = LocalPlayer.Character
+            if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+            local root = char.HumanoidRootPart
+            
+            for _, obj in ipairs(workspace:GetDescendants()) do
+                if obj:IsA("ProximityPrompt") and obj.Parent:IsA("BasePart") then
+                    local dist = (root.Position - obj.Parent.Position).magnitude
+                    if dist < 10 and obj.Enabled then
+                        pcall(function() fireproximityprompt(obj) end)
+                    end
+                elseif obj:IsA("ClickDetector") and obj.Parent:IsA("BasePart") then
+                    local dist = (root.Position - obj.Parent.Position).magnitude
+                    if dist < 10 then
+                        pcall(function() fireclickdetector(obj) end)
+                    end
+                end
+            end
+        end)
+    else
+        if oneTapEggConn then
+            oneTapEggConn:Disconnect()
+            oneTapEggConn = nil
+        end
+    end
+end)
+
+-- 3. ANTI GUARD
+local antiGuardConn = nil
+local safeZoneCFrame = CFrame.new(0, 50, 0) 
+
+createSettingToggle("ANTI GUARD", false, function(isOn)
+    if isOn then
+        -- Tambahan: Membuat layar halus seperti 120fps saat diaktifkan
+        pcall(function() 
+            if setfpscap then 
+                setfpscap(120) 
+            end 
+        end)
+        
+        antiGuardConn = RunService.Heartbeat:Connect(function()
+            local char = LocalPlayer.Character
+            if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+            local root = char.HumanoidRootPart
+            
+            local hasEgg = false
+            for _, child in ipairs(char:GetChildren()) do
+                if child:IsA("Tool") and string.find(string.lower(child.Name), "egg") then
+                    hasEgg = true
+                    break
+                end
+            end
+            
+            for _, model in ipairs(workspace:GetDescendants()) do
+                if model:IsA("Model") and model ~= char then
+                    local hum = model:FindFirstChildOfClass("Humanoid")
+                    local guardRoot = model:FindFirstChild("HumanoidRootPart")
+                    
+                    local nameLower = string.lower(model.Name)
+                    if hum and guardRoot and (string.find(nameLower, "guard") or string.find(nameLower, "npc") or string.find(nameLower, "enemy") or string.find(nameLower, "penjaga")) then
+                        local dist = (root.Position - guardRoot.Position).magnitude
+                        
+                        if dist < 40 then
+                            guardRoot.Anchored = true
+                            hum.WalkSpeed = 16
+                            
+                            if hasEgg then
+                                root.CFrame = safeZoneCFrame
+                                hasEgg = false
+                            end
+                        else
+                            guardRoot.Anchored = false
+                        end
+                    end
+                end
+            end
+        end)
+    else
+        if antiGuardConn then
+            antiGuardConn:Disconnect()
+            antiGuardConn = nil
+        end
+        for _, model in ipairs(workspace:GetDescendants()) do
+            if model:IsA("Model") then
+                local guardRoot = model:FindFirstChild("HumanoidRootPart")
+                if guardRoot then
+                    guardRoot.Anchored = false
+                end
+            end
+        end
+    end
+end)
+
 -- 4. KEGELAPAN Slider (0% - 100%)
 local DarkFrame = Instance.new("Frame")
 DarkFrame.Size = UDim2.new(0, 310, 0, 55)
-DarkFrame.Position = UDim2.new(0, 12, 0, 210)
+-- Posisi diatur otomatis oleh UIListLayout
 DarkFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
 DarkFrame.BackgroundTransparency = 0.2
 DarkFrame.Parent = SettingsFrame
@@ -1330,7 +1433,6 @@ end)
 -- ANIMASI & LOOPING
 -- ==========================================
 
--- Label Animasi Mengetik "LIPZY HUB V5.2"
 local TitleAnim = Instance.new("TextLabel")
 TitleAnim.Size = UDim2.new(0, 335, 0, 30)
 TitleAnim.Position = UDim2.new(0, 145, 0, 355)
@@ -1349,8 +1451,8 @@ TitleStroke.Parent = TitleAnim
 
 -- Efek Typing Animation Loop
 task.spawn(function()
-    -- DIUBAH: Teks animasi di bagian bawah menjadi V5.2
-    local fullText = "LIPZY HUB V5.2"
+    -- DIUBAH: Teks animasi di bagian bawah menjadi LIPZY BETA
+    local fullText = "LIPZY BETA"
     while task.wait(1) do
         for i = 1, #fullText do
             TitleAnim.Text = string.sub(fullText, 1, i)
