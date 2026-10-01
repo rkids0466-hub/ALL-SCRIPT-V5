@@ -24,8 +24,8 @@ local MainFrame = Instance.new("ImageLabel")
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 500, 0, 400)
 MainFrame.Position = UDim2.new(0.5, -250, 0.5, -200)
--- DIUBAH: ID Banner Background Utama menjadi 88880311850477
-MainFrame.Image = "rbxassetid://88880311850477"
+-- DIUBAH: ID Banner Background Utama menjadi 127504458218051
+MainFrame.Image = "rbxassetid://127504458218051"
 MainFrame.ScaleType = Enum.ScaleType.Crop
 MainFrame.Active = true
 MainFrame.Draggable = true
@@ -77,12 +77,13 @@ ReopenBanner.MouseButton1Click:Connect(function()
     ReopenBanner.Visible = false
 end)
 
--- Logo Kiri Atas
+-- Logo Kiri Atas (DIUBAH MENJADI PROFIL ROBLOX PENGGUNA)
 local LogoImage = Instance.new("ImageLabel")
 LogoImage.Size = UDim2.new(0, 110, 0, 110)
 LogoImage.Position = UDim2.new(0, 15, 0, 15)
--- DIUBAH: ID Gambar Logo Kiri Atas menjadi 96630662046740
-LogoImage.Image = "rbxassetid://96630662046740"
+-- Mengambil foto profil pengguna lokal secara dinamis
+local userId = LocalPlayer.UserId
+LogoImage.Image = "rbxthumb://type=AvatarHeadShot&id=" .. userId .. "&w=150&h=150"
 LogoImage.BackgroundTransparency = 1
 LogoImage.Parent = MainFrame
 
